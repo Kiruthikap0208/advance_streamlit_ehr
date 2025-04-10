@@ -110,10 +110,17 @@ if not st.session_state.logged_in:
                     st.error("Invalid email or password.")
 
             st.markdown('<div style="text-align: center; margin-top: 1rem;">', unsafe_allow_html=True)
-            st.markdown("[Forgot password?](#)")
-            if st.button("Don't have an account? Sign up"):
-                st.switch_page("pages/1_Signup.py")
+
+            col_forgot, col_signup = st.columns([1, 1])
+            with col_forgot:
+                if st.button("Forgot password?"):
+                    st.switch_page("pages/2_Forgot_Password.py")
+            with col_signup:
+                if st.button("Don't have an account? Sign up"):
+                    st.switch_page("pages/1_Signup.py")
+
             st.markdown('</div>', unsafe_allow_html=True)
+
 
 else:
     st.markdown("---")
