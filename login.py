@@ -7,7 +7,7 @@ def create_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="Nk258627",  # <- change this!
+        password="Nk258627",  # change this
         database="srm_ehr"
     )
 
@@ -27,6 +27,15 @@ if 'user_email' not in st.session_state:
 
 # ----------- PAGE SETUP -----------
 st.set_page_config(page_title="SRM Electronic Health Records", layout="wide")
+
+# Hide sidebar
+st.markdown("""
+    <style>
+        [data-testid="stSidebar"] {
+            display: none;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # Load background image
 with open(r"C:\Users\Kiruthika\Documents\advance_streamlit_ehr\copy-space-heart-shape-stethoscope.jpg", "rb") as img_file:
@@ -83,7 +92,6 @@ if not st.session_state.logged_in:
     col1, col2, col3 = st.columns([1, 1, 2.2])
     with col3:
         with st.container():
-            
             st.title("SRM Electronic Health Records")
             st.subheader("Welcome to SRM EHR Portal")
 
@@ -103,8 +111,9 @@ if not st.session_state.logged_in:
 
             st.markdown('<div style="text-align: center; margin-top: 1rem;">', unsafe_allow_html=True)
             st.markdown("[Forgot password?](#)")
-            st.markdown("[Don't have an account? Sign up](#)")
-            st.markdown('</div></div>', unsafe_allow_html=True)
+            if st.button("Don't have an account? Sign up"):
+                st.switch_page("pages/1_Signup.py")
+            st.markdown('</div>', unsafe_allow_html=True)
 
 else:
     st.markdown("---")
@@ -115,4 +124,3 @@ else:
         st.session_state.logged_in = False
         st.session_state.user_email = ""
         st.rerun()
-

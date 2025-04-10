@@ -1,8 +1,0 @@
-[theme]
-base="light"
-
-[server]
-headless = true
-
-[client]
-showSidebarNavigation = false

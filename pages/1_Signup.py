@@ -7,7 +7,7 @@ def create_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="your_password",  # change this!
+        password="Nk258627",  # change this
         database="srm_ehr"
     )
 
@@ -28,6 +28,15 @@ def register_user(email, password):
 
 # --------- PAGE SETUP ----------
 st.set_page_config(page_title="Signup | SRM EHR", layout="wide")
+
+# Hide sidebar
+st.markdown("""
+    <style>
+        [data-testid="stSidebar"] {
+            display: none;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # Background image
 with open(r"C:\Users\Kiruthika\Documents\advance_streamlit_ehr\copy-space-heart-shape-stethoscope.jpg", "rb") as img_file:
@@ -86,9 +95,11 @@ with col3:
     st.title("SRM Electronic Health Records")
     st.subheader("Create a new account")
 
+    name = st.text_input("Full Name")
     email = st.text_input("Email address")
     password = st.text_input("Password", type="password")
     confirm_password = st.text_input("Confirm Password", type="password")
+    
 
     if st.button("Sign up"):
         if not email or not password or not confirm_password:
@@ -99,10 +110,10 @@ with col3:
             st.error("An account with this email already exists.")
         else:
             register_user(email, password)
-            st.success("Account created successfully! Go to [Login](login.py)")
+            st.success("Account created successfully! Redirecting to login...")
+            st.switch_page("login.py")
 
     st.markdown('<div style="text-align: center; margin-top: 1rem;">', unsafe_allow_html=True)
-    st.markdown("[Already have an account? Login here](login.py)")
+    if st.button("Already have an account? Login here"):
+        st.switch_page("login.py")
     st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
