@@ -78,6 +78,9 @@ with col3:
             switch_page("5_Dashboard Admin")
         else:
             st.error("Invalid credentials or not an admin.")
+            
+    if st.button("Forgot password?"):
+        switch_page("Forgot_Password")
 
     if st.button("Don't have an account? Sign up"):
         switch_page("signup admin")

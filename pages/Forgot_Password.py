@@ -4,6 +4,7 @@ import random
 import smtplib
 from email.mime.text import MIMEText
 import base64
+from streamlit_extras.switch_page_button import switch_page
 
 # ---------------- DB CONNECTION ----------------
 def create_connection():
@@ -52,17 +53,16 @@ if 'verified_email' not in st.session_state:
 # ---------------- PAGE SETUP ----------------
 st.set_page_config(page_title="Forgot Password | SRM EHR", layout="wide")
 
-# Hide sidebar
+# Hide sidebar and header/footer
 st.markdown("""
     <style>
-        [data-testid="stSidebar"] {
-            display: none;
-        }
+        [data-testid="stSidebar"] { display: none; }
+        header, footer { visibility: hidden; }
     </style>
 """, unsafe_allow_html=True)
 
 # Background
-with open(r"C:\Users\Kiruthika\Documents\advance_streamlit_ehr\copy-space-heart-shape-stethoscope.jpg", "rb") as img_file:
+with open("copy-space-heart-shape-stethoscope.jpg", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
 st.markdown(f"""
@@ -78,6 +78,7 @@ st.markdown(f"""
     padding: 3rem 2rem;
     border-radius: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-align: center;
 }}
 h2, h3 {{
     text-align: center;
@@ -102,32 +103,32 @@ h2, h3 {{
 # ---------------- UI ----------------
 col1, col2, col3 = st.columns([1, 1, 2.2])
 with col3:
-    with st.container():
-        st.title("🔐 Forgot Password")
-        st.subheader("We'll send you an OTP to reset your password.")
+    
+    st.title("🔐 Forgot Password")
+    st.subheader("We'll send you an OTP to reset your password.")
 
-        email = st.text_input("Enter your registered email")
+    email = st.text_input("Enter your registered email")
 
-        if st.button("Send OTP"):
-            if not email:
-                st.warning("Please enter your email.")
-            elif not user_exists(email):
-                st.error("This email is not registered.")
+    if st.button("Send OTP"):
+        if not email:
+            st.warning("Please enter your email.")
+        elif not user_exists(email):
+            st.error("This email is not registered.")
+        else:
+            otp = str(random.randint(100000, 999999))
+            if send_otp(email, otp):
+                st.session_state.generated_otp = otp
+                st.session_state.verified_email = email
+                st.session_state.otp_sent = True
+                st.success("OTP has been sent to your email.")
+
+    if st.session_state.otp_sent:
+        entered_otp = st.text_input("Enter the OTP you received")
+        if st.button("Verify OTP"):
+            if entered_otp == st.session_state.generated_otp:
+                st.success("OTP Verified. Redirecting to reset password...")
+                switch_page("reset password")
             else:
-                otp = str(random.randint(100000, 999999))
-                if send_otp(email, otp):
-                    st.session_state.generated_otp = otp
-                    st.session_state.verified_email = email
-                    st.session_state.otp_sent = True
-                    st.success("OTP has been sent to your email.")
+                st.error("Incorrect OTP. Please try again.")
 
-        # Show OTP input only after sending
-        if st.session_state.otp_sent:
-            entered_otp = st.text_input("Enter the OTP you received")
-            if st.button("Verify OTP"):
-                if entered_otp == st.session_state.generated_otp:
-                    st.success("OTP Verified. Redirecting to reset password...")
-                    st.switch_page("pages/3_Reset_Password.py")
-                else:
-                    st.error("Incorrect OTP. Please try again.")
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)

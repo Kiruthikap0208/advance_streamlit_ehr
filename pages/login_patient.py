@@ -78,6 +78,9 @@ with col3:
             switch_page("pages/6_Dashboard_Patient.py")
         else:
             st.error("Invalid credentials or not a patient.")
+            
+    if st.button("Forgot password?"):
+        switch_page("Forgot_Password")
 
     if st.button("Don't have an account? Sign up"):
         switch_page("signup patient")
