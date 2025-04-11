@@ -4,12 +4,13 @@ import mysql.connector
 
 # ----------- DB CONNECTION -----------
 def create_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Nk258627",  # change this
-        database="srm_ehr"
-    )
+    conn = mysql.connector.connect(
+    host=st.secrets["mysql"]["host"],
+    user=st.secrets["mysql"]["user"],
+    password=st.secrets["mysql"]["password"],
+    database=st.secrets["mysql"]["database"]
+)
+
 
 def validate_user(email, password):
     conn = create_connection()
