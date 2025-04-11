@@ -16,12 +16,12 @@ if 'reset_email' not in st.session_state:
 
 # ---------- DB CONNECTION ----------
 def create_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Nk258627",
-        database="srm_ehr"
-    )
+    conn = mysql.connector.connect(
+    host=st.secrets["mysql"]["host"],
+    user=st.secrets["mysql"]["user"],
+    password=st.secrets["mysql"]["password"],
+    database=st.secrets["mysql"]["database"]
+)
 
 # ---------- SEND OTP ----------
 def send_otp_email(receiver_email, otp):
@@ -139,7 +139,9 @@ with col3:
             if st.button("Verify OTP"):
                 if user_otp == st.session_state.generated_otp:
                     st.success("OTP verified successfully!")
+                    st.query_params["email"] = email  # ✅ pass email to next page
                     st.switch_page("pages/3_reset_password.py")
                 else:
                     st.error("Incorrect OTP. Please try again.")
+
         st.markdown('</div>', unsafe_allow_html=True)

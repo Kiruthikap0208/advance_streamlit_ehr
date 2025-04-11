@@ -1,5 +1,3 @@
-# pages/3_reset_password.py
-
 import streamlit as st
 import mysql.connector
 
@@ -21,9 +19,9 @@ def update_password(email, new_password):
 
 # --- UI SETUP ---
 st.set_page_config(page_title="Reset Password | SRM EHR", layout="wide")
-
 st.title("🔑 Reset Your Password")
 
+# Get email from query params (updated method)
 email = st.query_params.get("email")
 
 if not email:
@@ -40,4 +38,4 @@ else:
         else:
             update_password(email, new_password)
             st.success("Password updated successfully! Go back to login.")
-            st.page_link("login.py", label="Back to Login", icon="🔐")
+            st.page_link("login.py", label="🔐 Back to Login")
