@@ -1,1 +1,14 @@
 I am developing an Electronic Health Record (EHR) management web app with streamlit framework and mysql db conn
+📁 advance_streamlit_ehr/
+│
+├── main.py  ← role selection page
+├── login_doctor.py
+├── login_admin.py
+├── login_patient.py
+├── pages/
+│   ├── 1_Signup.py
+│   ├── 2_Forgot_Password.py
+│   ├── 3_Reset_Password.py
+│   ├── 4_Dashboard_Doctor.py
+│   ├── 5_Dashboard_Admin.py
+│   └── 6_Dashboard_Patient.py
