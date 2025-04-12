@@ -12,7 +12,8 @@ def create_connection():
         host="localhost",
         user="root",
         password="Nk258627",
-        database="srm_ehr"
+        database="srm_ehr",
+        auth_plugin="mysql_native_password"
     )
 
 def user_exists(email):

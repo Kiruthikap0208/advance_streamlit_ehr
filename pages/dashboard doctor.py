@@ -2,6 +2,8 @@ import streamlit as st
 import mysql.connector
 import base64
 import pandas as pd
+from streamlit_extras.switch_page_button import switch_page
+from datetime import date
 
 # -------- DB CONNECTION --------
 def create_connection():
@@ -9,7 +11,8 @@ def create_connection():
         host="localhost",
         user="root",
         password="Nk258627",
-        database="srm_ehr"
+        database="srm_ehr",
+        auth_plugin = "mysql_native_password"
     )
 
 def get_all_patients():
@@ -54,7 +57,6 @@ st.markdown(f"""
 # -------- WELCOME --------
 col1, col2, col3 = st.columns([1, 1, 2])
 with col3:
-    st.markdown('<div class="box">', unsafe_allow_html=True)
     st.title("👨‍⚕️ Doctor Dashboard")
     st.write(f"Welcome, **{st.session_state.get('user_email', 'Doctor')}**!")
 
@@ -68,7 +70,7 @@ with col3:
     # -------- BUTTONS --------
     st.subheader("➕ Manage Patients")
     if st.button("Add New Patient"):
-        st.switch_page("pages/5_Add_Patient.py")  # We'll build this next
+        switch_page("add patient")  # We'll build this next
 
     # -------- PATIENT LIST --------
     st.subheader("👥 Patient List")

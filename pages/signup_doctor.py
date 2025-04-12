@@ -2,7 +2,7 @@ import streamlit as st
 import mysql.connector
 import base64
 from streamlit_extras.switch_page_button import switch_page
-
+from datetime import date
 
 # -------- DB CONNECTION --------
 def create_connection():
@@ -10,7 +10,8 @@ def create_connection():
         host="localhost",
         user="root",
         password="Nk258627",
-        database="srm_ehr"
+        database="srm_ehr",
+        auth_plugin="mysql_native_password"
     )
 
 def user_exists(email):
@@ -20,6 +21,14 @@ def user_exists(email):
     exists = cursor.fetchone() is not None
     conn.close()
     return exists
+
+def is_approved_doctor(name, dob):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM approved_doctors WHERE name = %s AND dob = %s", (name, dob))
+    approved = cursor.fetchone() is not None
+    conn.close()
+    return approved
 
 def register_doctor(name, email, password):
     conn = create_connection()
@@ -80,16 +89,19 @@ with col3:
 
     name = st.text_input("Full Name")
     email = st.text_input("Email Address")
+    dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
     password = st.text_input("Password", type="password")
     confirm = st.text_input("Confirm Password", type="password")
 
     if st.button("Create Account"):
-        if not name or not email or not password or not confirm:
+        if not name or not email or not dob or not password or not confirm:
             st.warning("Please fill in all fields.")
         elif password != confirm:
             st.error("Passwords do not match.")
         elif user_exists(email):
             st.error("An account with this email already exists.")
+        elif not is_approved_doctor(name, dob):
+            st.error("❌ You’re not approved by the hospital. Please contact admin.")
         else:
             register_doctor(name, email, password)
             st.success("✅ Account created successfully!")

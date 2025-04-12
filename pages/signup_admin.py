@@ -2,13 +2,15 @@ import streamlit as st
 import mysql.connector
 import base64
 from streamlit_extras.switch_page_button import switch_page
+from datetime import date
 
 def create_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
         password="Nk258627",
-        database="srm_ehr"
+        database="srm_ehr",
+        auth_plugin="mysql_native_password"
     )
 
 def user_exists(email):
@@ -18,6 +20,14 @@ def user_exists(email):
     exists = cursor.fetchone() is not None
     conn.close()
     return exists
+
+def is_approved_admin(name, dob):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM approved_admins WHERE name = %s AND dob = %s", (name, dob))
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
 
 def register_admin(name, email, password):
     conn = create_connection()
@@ -72,24 +82,27 @@ st.markdown(f"""
 
 col1, col2, col3 = st.columns([1, 1, 2.2])
 with col3:
-    st.title("📝 Admin Signup")
+    st.title("Admin Signup")
 
     name = st.text_input("Full Name")
     email = st.text_input("Email")
+    dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
     password = st.text_input("Password", type="password")
     confirm = st.text_input("Confirm Password", type="password")
 
     if st.button("Create Account"):
-        if not name or not email or not password or not confirm:
+        if not name or not email or not dob or not password or not confirm:
             st.warning("Please fill in all fields.")
         elif password != confirm:
             st.error("Passwords do not match.")
         elif user_exists(email):
             st.error("An account with this email already exists.")
+        elif not is_approved_admin(name, dob):
+            st.error("\u274c You’re not approved by the hospital. Please contact higher authority.")
         else:
             register_admin(name, email, password)
-            st.success("✅ Account created successfully!")
-            switch_page("login_admin")
+            st.success("\u2705 Account created successfully!")
+            switch_page("login admin")
 
     if st.button("Already have an account? Log in"):
         switch_page("login admin")
