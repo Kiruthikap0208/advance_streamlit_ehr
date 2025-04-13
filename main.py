@@ -10,6 +10,7 @@ def create_connection():
         user=st.secrets["mysql"]["user"],
         password=st.secrets["mysql"]["password"],
         database=st.secrets["mysql"]["database"],
+        port=st.secrets["mysql"]["port"],
         auth_plugin='mysql_native_password'
     )
     return conn
