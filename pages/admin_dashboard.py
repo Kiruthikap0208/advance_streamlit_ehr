@@ -41,7 +41,7 @@ st.markdown("""
     /* Transparent widget boxes with white text */
     .stSelectbox > div, .stDateInput > div, .stTimeInput > div, .stTextArea > div, .stTextInput > div, .stButton > button {
         background-color: rgba(255, 255, 255, 0.02) !important;
-        color: white !important;
+        color: black !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
         border-radius: 8px;
     }
@@ -49,13 +49,13 @@ st.markdown("""
     /* Ensure inner input areas are also transparent and white */
     .stTextArea textarea, .stTextInput input {
         background-color: transparent !important;
-        color: white !important;
+        color: black !important;
     }
 
     /* Dropdown and calendar popup styling */
     .css-1wa3eu0, .css-1n76uvr {
         background-color: rgba(0, 0, 0, 0.6) !important;
-        color: white !important;
+        color: black !important;
     }
 
     /* Label and text color fix */
