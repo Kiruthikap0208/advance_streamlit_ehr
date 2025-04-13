@@ -155,7 +155,7 @@ if selected == "Calendar":
             "editable": False,
             "eventDisplay": "list-item",
             "eventMaxLines": 3
-        }
+        },
         height = 1000
     )
 
