@@ -152,11 +152,11 @@ if selected == "Calendar":
         events=events,
         options={
             "initialView": "timeGridWeek",
-            "height": 1000,
             "editable": False,
-            "eventDisplay": "block",
+            "eventDisplay": "list-item",
             "eventMaxLines": 3
         }
+        height = 1000
     )
 
     if clicked and "event" in clicked:
