@@ -110,6 +110,7 @@ with st.sidebar:
 st.title("🏥 Admin Dashboard")
 
 # 🔔 Reminders Section
+user_id = st.session_state.get("user_id")
 conn = create_connection()
 cursor = conn.cursor()
 
