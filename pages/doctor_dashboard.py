@@ -1,10 +1,12 @@
 import streamlit as st
 import mysql.connector
-from datetime import date
+from datetime import date,datetime, timedelta,
 from streamlit_option_menu import option_menu
 from streamlit_extras.switch_page_button import switch_page
 import os
 import base64
+import streamlit_calendar as st_cal
+
 
 def create_connection():
     return mysql.connector.connect(
@@ -68,10 +70,19 @@ with st.sidebar:
             "Diagnoses",
             "Reports",
             "Prescriptions",
+            "Calendar",
             "Profile & Settings"
         ],
-        icons=["calendar-event", "people", "clipboard-plus", "file-earmark-text", "prescription", "gear"],
-        menu_icon="stethoscope",
+        icons=[
+            "calendar-day",
+            "people",
+            "stethoscope",
+            "file-earmark-medical",
+            "capsule",
+            "calendar",
+            "person-circle"
+        ],
+        menu_icon="person",
         default_index=0
     )
     st.markdown("---")
@@ -100,6 +111,28 @@ if reminders:
         st.info(f"🕒 {appt_time} — with {pname}")
 else:
     st.success("No upcoming appointments.")
+
+if selected == "Calendar":
+    st.subheader("📅 Appointment Calendar")
+    cursor.execute("""
+        SELECT a.appointment_time, p.name AS patient_name
+        FROM appointments a
+        JOIN users p ON a.patient_id = p.id
+        WHERE a.doctor_id = %s
+        ORDER BY a.appointment_time DESC
+    """, (user_id,))
+    appointments = cursor.fetchall()
+
+    st_cal.calendar(events=[
+        {
+            "title": f"{pname} Appointment",
+            "start": appt_time.isoformat(),
+            "end": (appt_time + timedelta(minutes=30)).isoformat()
+        } for appt_time, pname in appointments
+    ],
+    defaultView='timeGridWeek',
+    editable=False,
+    height=600)
 
 if selected == "Today's Appointments":
     st.subheader("📅 Today's Appointments")
