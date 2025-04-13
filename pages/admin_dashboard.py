@@ -38,29 +38,39 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    /* Transparent form fields with white text */
-    .stTextInput > div > input,
-    .stDateInput > div > input,
-    .stTimeInput > div > input,
-    .stSelectbox > div,
-    .stTextArea > div > textarea {
-        background-color: rgba(255, 255, 255, 0.1) !important;
+    /* Make input widgets transparent with white text */
+    .stSelectbox > div, .stDateInput > div, .stTimeInput > div, .stTextArea > div, .stTextInput > div, .stButton > button {
+        background-color: rgba(255, 255, 255, 0.05) !important;
         color: white !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 8px;
     }
 
-    /* Dropdown text color */
-    .css-1n76uvr, .css-1wa3eu0 {
+    /* Ensure dropdown items and calendar popups are also styled */
+    .css-1wa3eu0, .css-1n76uvr {
+        background-color: rgba(0, 0, 0, 0.7) !important;
         color: white !important;
     }
 
-    /* Focused input borders */
-    .stTextInput > div > input:focus,
-    .stDateInput > div > input:focus,
-    .stTimeInput > div > input:focus,
-    .stTextArea > div > textarea:focus {
-        border: 1px solid #ffffff !important;
-        box-shadow: 0 0 5px rgba(255,255,255,0.3);
+    .stTextArea textarea, .stTextInput input {
+        background-color: transparent !important;
+        color: white !important;
+    }
+
+    /* White label text */
+    label, .st-bb, .st-c6 {
+        color: white !important;
+    }
+
+    /* Success messages and text outputs */
+    .stAlert, .stMarkdown {
+        color: white !important;
+    }
+
+    /* Button hover effect */
+    .stButton > button:hover {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
     }
     </style>
 """, unsafe_allow_html=True)
