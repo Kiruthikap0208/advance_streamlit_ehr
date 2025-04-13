@@ -34,7 +34,11 @@ st.markdown("""
         -webkit-backdrop-filter: blur(10px) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
-
+    button[kind="primary"], button[kind="secondary"] {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        color: white !important;
+        border: 1px solid white !important;
+    }
 
     /* 4. Hide Streamlit footer and main menu */
     #MainMenu, footer {
