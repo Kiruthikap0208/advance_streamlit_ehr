@@ -1,7 +1,7 @@
 import streamlit as st
 import mysql.connector
 from streamlit_option_menu import option_menu
-from datetime import date
+from datetime import date, timedelta, datetime
 import os
 from streamlit_extras.switch_page_button import switch_page
 import base64
@@ -133,7 +133,7 @@ else:
 conn.close()
 
 if selected == "Calendar":
-    st.subheader("🗕️ Appointment Calendar")
+    st.subheader("📅 Appointment Calendar")
     cursor.execute("""
         SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name
         FROM appointments a
@@ -143,19 +143,22 @@ if selected == "Calendar":
     """)
     appointments = cursor.fetchall()
 
+    events = []
+    for appt_time, pname, dname in appointments:
+        events.append({
+            "title": f"{pname} with Dr. {dname}",
+            "start": appt_time.isoformat(),
+            "end": (appt_time + timedelta(minutes=30)).isoformat()
+        })
+
     st_cal.calendar(
-        events=[
-            {
-                "title": f"{pname} with Dr. {dname}",
-                "start": appt_time.isoformat(),
-                "end": (appt_time + timedelta(minutes=30)).isoformat()
-            } for appt_time, pname, dname in appointments
-        ],
+        events=events,
         options={
             "initialView": "timeGridWeek",
             "height": 600,
             "editable": False
-        }
+        },
+        key="admin_calendar"
     )
 
 if selected == "Dashboard":
