@@ -36,35 +36,58 @@ def generate_custom_id(prefix, role):
 
 st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
-st.markdown(""" 
+st.markdown("""
     <style>
-    div[data-testid="stSidebarNav"] > ul { display: none; }
+    /* Sidebar transparency and text */
+    div[data-testid="stSidebarNav"] > ul {
+        display: none;
+    }
     section[data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.3) !important;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
     section[data-testid="stSidebar"] * {
         color: #ffffff !important;
     }
-    /* Make text input boxes transparent and text light */
-    input[type="text"], input[type="email"], input[type="password"], input[type="date"] {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
+
+    /* Main content text */
+    .stApp * {
+        color: #f8f9fa !important;
     }
-    textarea, select {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
+
+    /* Transparent and styled inputs */
+    input, textarea, select {
+        background-color: rgba(255, 255, 255, 0.07) !important;
+        color: #f1f1f1 !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 0.5rem !important;
+        padding: 0.5rem !important;
     }
-    ::placeholder {
-        color: #dddddd !important;
-        opacity: 0.8;
+
+    /* Placeholder text in inputs */
+    input::placeholder, textarea::placeholder {
+        color: #bbbbbb !important;
     }
-    #MainMenu, footer { visibility: hidden; }
+
+    /* Drop-down arrow color for select */
+    select option {
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+    }
+
+    /* Optional: styling button */
+    button[kind="primary"] {
+        background-color: #0a84ff !important;
+        color: white !important;
+        border-radius: 0.5rem !important;
+    }
+
+    /* Hide menu and footer */
+    #MainMenu, footer {
+        visibility: hidden;
+    }
     </style>
 """, unsafe_allow_html=True)
 
