@@ -53,11 +53,27 @@ st.markdown("""
     .stApp * {
         color: #f8f9fa !important;
     }
-    #MainMenu, footer {
-        visibility: hidden;
+    input, textarea, select {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }
+
+    input::placeholder, textarea::placeholder {
+        color: #cccccc !important;
+    }
+
+    .stDateInput input, .stTimeInput input {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+    }
+
+        #MainMenu, footer {
+            visibility: hidden;
+        }
     </style>
 """, unsafe_allow_html=True)
+
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
 
