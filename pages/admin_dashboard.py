@@ -154,9 +154,10 @@ if selected == "Calendar":
             "initialView": "timeGridWeek",
             "editable": False,
             "eventDisplay": "block",
-            "eventMaxLines": 4
+            "eventMaxLines": 4,
+            "height": 850 
         },
-        height=950  # Ensure this is outside options
+          # Ensure this is outside options
     )
 
     if clicked and "event" in clicked:
