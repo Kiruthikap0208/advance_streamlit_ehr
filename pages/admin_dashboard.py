@@ -38,16 +38,47 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
+    /* Hide default sidebar nav */
     div[data-testid="stSidebarNav"] > ul { display: none; }
+
+    /* Custom sidebar */
     section[data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.3) !important;
         backdrop-filter: blur(10px);
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
-    section[data-testid="stSidebar"] * { color: #ffffff !important; }
+
+    /* Sidebar text color */
+    section[data-testid="stSidebar"] * {
+        color: #ffffff !important;
+    }
+
+    /* Main content text color */
+    div[class^="block-container"] * {
+        color: #f1f1f1 !important;
+    }
+
+    /* Make input boxes transparent */
+    input, textarea, select {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 5px !important;
+    }
+
+    /* Button style */
+    button[kind="primary"] {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 5px !important;
+    }
+
+    /* Hide Streamlit main menu & footer */
     #MainMenu, footer { visibility: hidden; }
     </style>
 """, unsafe_allow_html=True)
+
 
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
