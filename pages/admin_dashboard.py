@@ -125,25 +125,30 @@ else:
 conn.close()
 
 if selected == "Calendar":
-    st.subheader("📆 All Scheduled Appointments")
-    conn = create_connection()
+    st.subheader("📅 All Appointments Calendar")
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT a.appointment_time, p.name AS patient, d.name AS doctor
+        SELECT a.appointment_time, u1.name AS patient_name, u2.name AS doctor_name
         FROM appointments a
-        JOIN users p ON a.patient_id = p.id
-        JOIN users d ON a.doctor_id = d.id
+        JOIN users u1 ON a.patient_id = u1.id
+        JOIN users u2 ON a.doctor_id = u2.id
     """)
     events = cursor.fetchall()
-    conn.close()
 
-    st_cal.calendar(events=[
-        {
-            "title": f"{patient} with Dr. {doctor}",
-            "start": time.isoformat(),
-            "end": (time + timedelta(minutes=30)).isoformat()
-        } for time, patient, doctor in events
-    ], defaultView='dayGridMonth', height=700)
+    st_cal.calendar(
+        events=[
+            {
+                "title": f"{pname} with Dr. {dname}",
+                "start": appt_time.isoformat(),
+                "end": (appt_time + timedelta(minutes=30)).isoformat()
+            } for appt_time, pname, dname in events
+        ],
+        options={
+            "initialView": "timeGridWeek",
+            "height": 600,
+            "editable": False
+        }
+    )
 
 if selected == "Dashboard":
     st.subheader("📊 Overview")

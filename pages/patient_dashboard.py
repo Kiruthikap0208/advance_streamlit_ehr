@@ -117,27 +117,31 @@ if selected == "My Health Records":
     else:
         st.error("Patient record not found.")
 
-elif selected == "Appointments":
-    st.subheader("📅 My Appointments")
+if selected == "Appointments":
+    st.subheader("📅 My Appointments (Calendar View)")
+    cursor = conn.cursor()
     cursor.execute("""
-        SELECT a.appointment_time, a.notes, u.name AS doctor_name
+        SELECT a.appointment_time, u.name AS doctor_name
         FROM appointments a
         JOIN users u ON a.doctor_id = u.id
         WHERE a.patient_id = %s
-        ORDER BY a.appointment_time DESC
     """, (user_id,))
     appointments = cursor.fetchall()
 
-    st_cal.calendar(events=[
-        {
-            "title": f"With Dr. {doctor_name}: {notes}",
-            "start": appt_time.isoformat(),
-            "end": (appt_time + timedelta(minutes=30)).isoformat()
-        } for appt_time, notes, doctor_name in appointments
-    ],
-    defaultView='timeGridWeek',
-    editable=False,
-    height=600)
+    st_cal.calendar(
+        events=[
+            {
+                "title": f"Appointment with Dr. {dname}",
+                "start": appt_time.isoformat(),
+                "end": (appt_time + timedelta(minutes=30)).isoformat()
+            } for appt_time, dname in appointments
+        ],
+        options={
+            "initialView": "timeGridWeek",
+            "height": 600,
+            "editable": False
+        }
+    )
 
 elif selected == "Reports":
     st.subheader("📂 My Medical Reports")
