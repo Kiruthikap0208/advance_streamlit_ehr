@@ -36,43 +36,35 @@ def generate_custom_id(prefix, role):
 
 st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
-st.markdown("""
+st.markdown(""" 
     <style>
-    /* Sidebar & general app color tweaks */
+    div[data-testid="stSidebarNav"] > ul { display: none; }
+    section[data-testid="stSidebar"] {
+        background-color: rgba(0, 0, 0, 0.3) !important;
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
     section[data-testid="stSidebar"] * {
         color: #ffffff !important;
     }
-
-    .stApp * {
-        color: #f8f9fa !important;
-    }
-
-    /* Input fields (text, date, email, etc.) */
-    .stTextInput > div > input,
-    .stDateInput > div > input,
-    .stTextArea textarea,
-    .stSelectbox > div > div {
-        background-color: rgba(255, 255, 255, 0.05) !important;
+    /* Make text input boxes transparent and text light */
+    input[type="text"], input[type="email"], input[type="password"], input[type="date"] {
+        background-color: rgba(255, 255, 255, 0.1) !important;
         color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        border-radius: 0.5rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
     }
-
-    /* Dropdown text (for departments, doctors, etc.) */
-    .css-1d391kg {
-        color: white !important;
+    textarea, select {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
     }
-
-    /* Placeholder text */
-    input::placeholder,
-    textarea::placeholder {
-        color: #cccccc !important;
+    ::placeholder {
+        color: #dddddd !important;
+        opacity: 0.8;
     }
-
-    /* Hide Streamlit default footer */
-    #MainMenu, footer {
-        visibility: hidden;
-    }
+    #MainMenu, footer { visibility: hidden; }
     </style>
 """, unsafe_allow_html=True)
 
