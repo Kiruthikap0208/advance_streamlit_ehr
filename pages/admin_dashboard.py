@@ -151,7 +151,7 @@ if selected == "Calendar":
     clicked = st_cal.calendar(
         events=events,
         options={
-            "initialView": "timeGridWeek",
+            "initialView": "dayGridMonth",
             "editable": False,
             "eventDisplay": "block",
             "eventMaxLines": 4,
