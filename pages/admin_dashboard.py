@@ -117,7 +117,7 @@ cursor = conn.cursor()
 if selected == "Calendar":
     st.subheader("📅 Appointment Calendar")
     cursor.execute("""
-        SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name
+        SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name, a.notes
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
@@ -126,11 +126,14 @@ if selected == "Calendar":
     appointments = cursor.fetchall()
 
     events = []
-    for appt_time, pname, dname in appointments:
+    for appt_time, pname, dname, notes in appointments:
         events.append({
             "title": f"{pname} with Dr. {dname}",
             "start": appt_time.isoformat(),
-            "end": (appt_time + timedelta(minutes=30)).isoformat()
+            "end": (appt_time + timedelta(minutes=30)).isoformat(),
+            "extendedProps": {
+                "notes": notes
+            }
         })
 
     st_cal.calendar(
@@ -138,7 +141,18 @@ if selected == "Calendar":
         options={
             "initialView": "timeGridWeek",
             "height": 600,
-            "editable": False
+            "editable": False,
+            "eventDidMount": """
+                function(info) {
+                    if (info.event.extendedProps.notes) {
+                        tippy(info.el, {
+                            content: info.event.extendedProps.notes,
+                            placement: 'top',
+                            theme: 'light-border'
+                        });
+                    }
+                }
+            """
         },
         key="admin_calendar"
     )
