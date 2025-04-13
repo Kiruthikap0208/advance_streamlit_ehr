@@ -116,55 +116,52 @@ cursor = conn.cursor()
 
 if selected == "Calendar":
     st.subheader("📅 Appointment Calendar")
+    conn = create_connection()
+    cursor = conn.cursor()
     cursor.execute("""
-        SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name, a.notes, p.id, d.id
+        SELECT a.id, a.appointment_time, a.notes, p.id, p.name, d.id, d.name
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
-        ORDER BY a.appointment_time DESC
     """)
-    appointments = cursor.fetchall()
+    results = cursor.fetchall()
 
     events = []
+    appointment_info = {}
 
-    for appt_time, pname, dname, notes, pid, did in appointments:
+    for aid, appt_time, notes, pid, pname, did, dname in results:
+        title = f"{pname} with Dr. {dname}"
         events.append({
-            "title": f"{pname} with Dr. {dname}",
+            "id": str(aid),
+            "title": title,
             "start": appt_time.isoformat(),
-            "end": (appt_time + timedelta(minutes=30)).isoformat(),
-            "extendedProps": {
-                "patient_id": pid,
-                "patient_name": pname,
-                "doctor_id": did,
-                "doctor_name": dname,
-                "notes": notes or "No notes available"
-            }
+            "end": (appt_time + timedelta(minutes=30)).isoformat()
         })
+        appointment_info[str(aid)] = {
+            "Patient ID": pid,
+            "Patient Name": pname,
+            "Doctor ID": did,
+            "Doctor Name": dname,
+            "Appointment Notes": notes
+        }
 
-    clicked = fullcalendar(
+    clicked_event = fullcalendar(
         events=events,
         options={
             "initialView": "timeGridWeek",
             "height": 600,
-            "editable": False,
-            "eventClick": True
+            "editable": False
         },
-        key="calendar_admin"
+        key="admin_calendar"
     )
 
-    if clicked and "extendedProps" in clicked:
-        ep = clicked["extendedProps"]
-        st.markdown(f"""
-        ### 🗂️ Appointment Info
-        - **👤 Patient ID:** {ep['patient_id']}
-        - **👤 Patient Name:** {ep['patient_name']}
-        - **🧑‍⚕️ Doctor ID:** {ep['doctor_id']}
-        - **🧑‍⚕️ Doctor Name:** {ep['doctor_name']}
-        - **📝 Notes:** {ep['notes']}
-        """)
+    if clicked_event and clicked_event.get("id") in appointment_info:
+        st.subheader("📋 Appointment Details")
+        info = appointment_info[clicked_event["id"]]
+        for key, value in info.items():
+            st.write(f"**{key}:** {value}")
 
-
-if selected == "Dashboard":
+elif selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
     cursor.execute("""
         SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name
