@@ -129,11 +129,10 @@ if selected == "Calendar":
     """)
     appointments = cursor.fetchall()
 
-    # Build calendar events with detailed info
     events = []
     event_lookup = {}
     for aid, appt_time, notes, pid, pname, did, dname in appointments:
-        title = f"PID: {pid} | DID: {did}\nTime: {appt_time.strftime('%H:%M')} | Notes: {notes or 'N/A'}"
+        title = f"🧑 PID: {pid} | 👨‍⚕️ DID: {did} | ⏰ {appt_time.strftime('%H:%M')}\n📝 {notes or 'N/A'}"
         event = {
             "id": str(aid),
             "title": title,
@@ -147,17 +146,18 @@ if selected == "Calendar":
             "Appointment Time": appt_time.strftime("%Y-%m-%d %H:%M"),
             "Notes": notes or "No notes"
         }
-    # Calendar rendering
+
     clicked = st_cal.calendar(
         events=events,
         options={
             "initialView": "timeGridWeek",
-            "height": 600,
+            "height": 650,
             "editable": False,
+            "eventDisplay": "block",
+            "eventMaxLines": 3
         }
     )
 
-    # Display info if event clicked
     if clicked and "event" in clicked:
         appt_id = clicked["event"].get("id")
         if appt_id and appt_id in event_lookup:
