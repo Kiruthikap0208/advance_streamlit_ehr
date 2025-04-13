@@ -113,30 +113,59 @@ else:
     st.success("No upcoming appointments.")
 
 if selected == "Calendar":
-    st.subheader("📅 Appointment Calendar")
+    st.subheader("📅 Appointments Calendar")
+
+    conn = create_connection()
+    cursor = conn.cursor()
     cursor.execute("""
-        SELECT a.appointment_time, p.name AS patient_name
+        SELECT a.id, a.appointment_time, a.notes,
+            p.id AS patient_id, p.name AS patient_name,
+            d.id AS doctor_id, d.name AS doctor_name
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
+        JOIN users d ON a.doctor_id = d.id
         WHERE a.doctor_id = %s
-        ORDER BY a.appointment_time DESC
     """, (user_id,))
     appointments = cursor.fetchall()
 
-    st_cal.calendar(
-        events=[
-            {
-                "title": f"{pname} Appointment",
-                "start": appt_time.isoformat(),
-                "end": (appt_time + timedelta(minutes=30)).isoformat()
-            } for appt_time, pname in appointments
-        ],
-        options={
-            "initialView": "timeGridWeek",
-            "height": 600,
-            "editable": False
+    events = []
+    event_lookup = {}
+    for aid, appt_time, notes, pid, pname, did, dname in appointments:
+        short_note = (notes[:40] + '...') if notes and len(notes) > 40 else (notes or 'N/A')
+        title = f"PID: {pid} | 🕒 {appt_time.strftime('%H:%M')}\n📝 {short_note}"
+        event = {
+            "id": str(aid),
+            "title": title,
+            "start": appt_time.isoformat(),
+            "end": (appt_time + timedelta(minutes=30)).isoformat()
         }
+        events.append(event)
+        event_lookup[str(aid)] = {
+            "Patient ID": pid,
+            "Patient Name": pname,
+            "Doctor ID": did,
+            "Doctor Name": dname,
+            "Appointment Time": appt_time.strftime("%Y-%m-%d %H:%M"),
+            "Notes": notes or "No notes"
+        }
+
+    clicked = st_cal.calendar(
+        events=events,
+        options={
+            "initialView": "timeGridDay",
+            "editable": False,
+            "eventDisplay": "block",
+            "eventMaxLines": 4,
+            "height": 850
+        },
     )
+
+    if clicked and "event" in clicked:
+        appt_id = clicked["event"].get("id")
+        if appt_id and appt_id in event_lookup:
+            st.success("📌 Appointment Details")
+            for key, value in event_lookup[appt_id].items():
+                st.markdown(f"**{key}:** {value}")
 
 if selected == "Today's Appointments":
     st.subheader("📅 Today's Appointments")
