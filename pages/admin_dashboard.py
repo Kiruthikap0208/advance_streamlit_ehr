@@ -116,32 +116,27 @@ cursor = conn.cursor()
 
 if selected == "Calendar":
     st.subheader("📅 Appointment Calendar")
-
     cursor.execute("""
-        SELECT a.appointment_time, a.notes, 
-               p.id AS patient_id, p.name AS patient_name,
-               d.id AS doctor_id, d.name AS doctor_name
+        SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name, a.notes, p.id, d.id
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
-        WHERE a.doctor_id = %s
         ORDER BY a.appointment_time DESC
-    """, (user_id,))
+    """)
     appointments = cursor.fetchall()
 
     events = []
-    for appt_time, notes, pid, pname, did, dname in appointments:
-        tooltip = f"""
-        🧑 Patient: {pname} ({pid})  
-        🩺 Doctor: {dname} ({did})  
-        📝 Notes: {notes or 'No notes'}
-        """
+    for appt_time, pname, dname, notes, pid, did in appointments:
         events.append({
-            "title": f"{pname} Appointment",
+            "title": f"{pname} with Dr. {dname}",
             "start": appt_time.isoformat(),
             "end": (appt_time + timedelta(minutes=30)).isoformat(),
             "extendedProps": {
-                "tooltip": tooltip.strip()
+                "description": f"""
+                Patient ID: {pid}\n
+                Doctor ID: {did}\n
+                Notes: {notes or 'No additional notes'}
+                """
             }
         })
 
@@ -151,19 +146,37 @@ if selected == "Calendar":
             "initialView": "timeGridWeek",
             "height": 600,
             "editable": False,
-            "eventDidMount": """(info) => {
-                const tooltip = info.event.extendedProps.tooltip;
-                if (tooltip) {
-                    tippy(info.el, {
-                        content: tooltip,
-                        allowHTML: true,
-                        theme: 'light-border',
-                    });
+            "eventMouseEnter": """
+                function(info) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.innerText = info.event.extendedProps.description;
+                    tooltip.style.position = 'absolute';
+                    tooltip.style.background = '#f8f9fa';
+                    tooltip.style.border = '1px solid #ccc';
+                    tooltip.style.padding = '5px';
+                    tooltip.style.borderRadius = '4px';
+                    tooltip.style.fontSize = '12px';
+                    tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                    tooltip.style.pointerEvents = 'none';
+                    tooltip.style.zIndex = 1000;
+                    document.body.appendChild(tooltip);
+                    function moveTooltip(e) {
+                        tooltip.style.left = e.pageX + 10 + 'px';
+                        tooltip.style.top = e.pageY + 10 + 'px';
+                    }
+                    function removeTooltip() {
+                        tooltip.remove();
+                        info.el.removeEventListener('mousemove', moveTooltip);
+                        info.el.removeEventListener('mouseleave', removeTooltip);
+                    }
+                    info.el.addEventListener('mousemove', moveTooltip);
+                    info.el.addEventListener('mouseleave', removeTooltip);
                 }
-            }"""
-        }
+            """
+        },
+        key="admin_calendar"
     )
-
 
 if selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
