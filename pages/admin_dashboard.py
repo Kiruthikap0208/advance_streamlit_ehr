@@ -38,17 +38,26 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    div[data-testid="stSidebarNav"] > ul { display: none; }
+    div[data-testid="stSidebarNav"] > ul {
+        display: none;
+    }
     section[data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.3) !important;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
-    section[data-testid="stSidebar"] * { color: #ffffff !important; }
-    #MainMenu, footer { visibility: hidden; }
+    section[data-testid="stSidebar"] * {
+        color: #ffffff !important;
+    }
+    .stApp * {
+        color: #f8f9fa !important;
+    }
+    #MainMenu, footer {
+        visibility: hidden;
+    }
     </style>
 """, unsafe_allow_html=True)
-
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
 
@@ -95,6 +104,38 @@ st.title("🏥 Admin Dashboard")
 user_id = st.session_state.get("user_id")
 conn = create_connection()
 cursor = conn.cursor()
+
+if selected == "Dashboard":
+    st.subheader("📊 Overview")
+
+    cursor.execute("SELECT COUNT(*) FROM users WHERE role='patient'")
+    total_patients = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM users WHERE role='doctor'")
+    total_doctors = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM appointments")
+    total_appointments = cursor.fetchone()[0]
+
+    st.metric("Total Patients", total_patients)
+    st.metric("Total Doctors", total_doctors)
+    st.metric("Total Appointments", total_appointments)
+
+    st.subheader("📅 Upcoming Appointments")
+    today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cursor.execute("""
+        SELECT a.id, u1.name as patient_name, u2.name as doctor_name, a.appointment_time, a.notes
+        FROM appointments a
+        JOIN users u1 ON a.patient_id = u1.id
+        JOIN users u2 ON a.doctor_id = u2.id
+        WHERE a.appointment_time >= %s
+        ORDER BY a.appointment_time ASC
+        LIMIT 5
+    """, (today,))
+    upcoming = cursor.fetchall()
+
+    for app in upcoming:
+        st.write(f"🗓️ {app[3]} | Patient: {app[1]} | Doctor: {app[2]} | Notes: {app[4]}")
 
 if selected == "Departments":
     st.subheader("🏢 Hospital Departments")
