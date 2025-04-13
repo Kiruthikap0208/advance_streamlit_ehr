@@ -268,7 +268,8 @@ elif selected == "Prescriptions":
 
 elif selected == "Profile & Settings": 
     st.subheader("⚙️ Profile & Settings")
-
+    user_id = st.session_state.get("user_id")
+    
     if not user_id:
         st.error("No doctor is logged in.")
     else:
