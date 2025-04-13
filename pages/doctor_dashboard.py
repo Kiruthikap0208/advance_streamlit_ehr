@@ -35,10 +35,6 @@ st.markdown("""
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* 3. Optional: Change sidebar text/icon color to white for better contrast */
-    section[data-testid="stSidebar"] * {
-        color: #ffffff !important;
-    }
 
     /* 4. Hide Streamlit footer and main menu */
     #MainMenu, footer {

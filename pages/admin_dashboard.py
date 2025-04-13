@@ -38,10 +38,12 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
+    /* 2. Make the sidebar background transparent and glassy */
     section[data-testid="stSidebar"] {
-        background: linear-gradient(to bottom, #003973, #E5E5BE);
-        color: white !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.3);
+        background-color: rgba(0, 0, 0, 0.3) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
     section[data-testid="stSidebar"] * {
         color: white !important;
