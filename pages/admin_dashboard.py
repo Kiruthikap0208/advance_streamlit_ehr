@@ -61,7 +61,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Set background image
-with open(r"C:\Users\Kiruthika\Documents\advance_streamlit_ehr\dashboard_bh_img.jpg", "rb") as img_file:
+with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
 
 st.markdown(f"""
