@@ -126,19 +126,26 @@ if selected == "Calendar":
     appointments = cursor.fetchall()
 
     events = []
+    event_info_map = {}
+
     for appt_time, pname, dname, notes, pid, did in appointments:
+        event_title = f"{pname} with Dr. {dname}"
+        event_start = appt_time.isoformat()
+        event_end = (appt_time + timedelta(minutes=30)).isoformat()
+
         events.append({
-            "title": f"{pname} with Dr. {dname}",
-            "start": appt_time.isoformat(),
-            "end": (appt_time + timedelta(minutes=30)).isoformat(),
-            "extendedProps": {
-                "patient_id": pid,
-                "patient_name": pname,
-                "doctor_id": did,
-                "doctor_name": dname,
-                "notes": notes or 'No additional notes'
-            }
+            "title": event_title,
+            "start": event_start,
+            "end": event_end,
         })
+
+        event_info_map[event_title] = {
+            "patient_id": pid,
+            "patient_name": pname,
+            "doctor_id": did,
+            "doctor_name": dname,
+            "notes": notes or 'No additional notes'
+        }
 
     clicked_event = st_cal.calendar(
         events=events,
@@ -151,20 +158,18 @@ if selected == "Calendar":
     )
 
     if clicked_event:
-        ep = clicked_event.get("extendedProps")
-        if ep:
+        title = clicked_event.get("title")
+        if title and title in event_info_map:
+            ep = event_info_map[title]
             st.info(f"""
             **📌 Appointment Details:**
 
-            - 👤 **Patient ID:** {ep.get('patient_id')}
-            - 🧑‍⚕️ **Doctor ID:** {ep.get('doctor_id')}
-            - 👤 **Patient Name:** {ep.get('patient_name')}
-            - 🧑‍⚕️ **Doctor Name:** {ep.get('doctor_name')}
-            - 📝 **Notes:** {ep.get('notes')}
+            - 👤 **Patient ID:** {ep['patient_id']}
+            - 🧑‍⚕️ **Doctor ID:** {ep['doctor_id']}
+            - 👤 **Patient Name:** {ep['patient_name']}
+            - 🧑‍⚕️ **Doctor Name:** {ep['doctor_name']}
+            - 📝 **Notes:** {ep['notes']}
             """)
-        else:
-            st.warning("No extra details available for this event.")
-
 
 if selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
