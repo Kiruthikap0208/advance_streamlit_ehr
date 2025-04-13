@@ -126,25 +126,28 @@ if selected == "Calendar":
     appointments = cursor.fetchall()
 
     events = []
-    event_info_map = {}
+    event_details_map = {}
 
-    for appt_time, pname, dname, notes, pid, did in appointments:
+    for index, (appt_time, pname, dname, notes, pid, did) in enumerate(appointments):
+        event_id = f"event_{index}"
         event_title = f"{pname} with Dr. {dname}"
         event_start = appt_time.isoformat()
         event_end = (appt_time + timedelta(minutes=30)).isoformat()
 
         events.append({
+            "id": event_id,
             "title": event_title,
             "start": event_start,
             "end": event_end,
-            "extendedProps": {
-                "patient_id": pid,
-                "patient_name": pname,
-                "doctor_id": did,
-                "doctor_name": dname,
-                "notes": notes or 'No additional notes'
-            }
         })
+
+        event_details_map[event_id] = {
+            "patient_id": pid,
+            "patient_name": pname,
+            "doctor_id": did,
+            "doctor_name": dname,
+            "notes": notes or 'No additional notes'
+        }
 
     clicked_event = fullcalendar(
         events=events,
@@ -156,8 +159,8 @@ if selected == "Calendar":
         key="admin_calendar"
     )
 
-    if clicked_event and "extendedProps" in clicked_event:
-        ep = clicked_event["extendedProps"]
+    if clicked_event and clicked_event.get("id") in event_details_map:
+        ep = event_details_map[clicked_event["id"]]
         st.info(f"""
         **📌 Appointment Details:**
 
