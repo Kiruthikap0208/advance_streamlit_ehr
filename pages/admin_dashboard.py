@@ -1,9 +1,9 @@
 import streamlit as st
 import mysql.connector
-from datetime import datetime, timedelta, date
 from streamlit_option_menu import option_menu
-from streamlit_extras.switch_page_button import switch_page
+from datetime import date, timedelta, datetime
 import os
+from streamlit_extras.switch_page_button import switch_page
 import base64
 import streamlit_calendar as st_cal
 
@@ -105,6 +105,8 @@ with st.sidebar:
     if st.button("🔙 Back to Main Page"):
         switch_page("main")
 
+
+
 st.title("🏥 Admin Dashboard")
 
 # 🔔 Reminders Section
@@ -143,23 +145,23 @@ if selected == "Calendar":
 
 if selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
-        cursor.execute("""
-            SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name
-            FROM appointments a
-            JOIN users p ON a.patient_id = p.id
-            JOIN users d ON a.doctor_id = d.id
-            WHERE a.appointment_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
-            ORDER BY a.appointment_time
-        """)
-        reminders = cursor.fetchall()
+    cursor.execute("""
+        SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name
+        FROM appointments a
+        JOIN users p ON a.patient_id = p.id
+        JOIN users d ON a.doctor_id = d.id
+        WHERE a.appointment_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
+        ORDER BY a.appointment_time
+    """)
+    reminders = cursor.fetchall()
 
-        if reminders:
-            for appt_time, pname, dname in reminders:
-                st.info(f"🕒 {appt_time} — {pname} with Dr. {dname}")
-        else:
-            st.success("No upcoming appointments in the next 24 hours.")
+    if reminders:
+        for appt_time, pname, dname in reminders:
+            st.info(f"🕒 {appt_time} — {pname} with Dr. {dname}")
+    else:
+        st.success("No upcoming appointments in the next 24 hours.")
 
-        conn.close()
+    conn.close()
 
     st.subheader("📊 Overview")
     conn = create_connection()
