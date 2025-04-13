@@ -68,9 +68,9 @@ st.markdown("""
         color: #ffffff !important;
     }
 
-        #MainMenu, footer {
-            visibility: hidden;
-        }
+    #MainMenu, footer {
+        visibility: hidden;
+    }
     </style>
 """, unsafe_allow_html=True)
 
