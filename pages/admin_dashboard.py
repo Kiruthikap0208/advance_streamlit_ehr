@@ -38,41 +38,44 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    div[data-testid="stSidebarNav"] > ul {
-        display: none;
-    }
-    section[data-testid="stSidebar"] {
-        background-color: rgba(0, 0, 0, 0.3) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-    }
+    /* Sidebar & general app color tweaks */
     section[data-testid="stSidebar"] * {
         color: #ffffff !important;
     }
+
     .stApp * {
         color: #f8f9fa !important;
     }
-    input, textarea, select {
-        background-color: rgba(255, 255, 255, 0.1) !important;
+
+    /* Input fields (text, date, email, etc.) */
+    .stTextInput > div > input,
+    .stDateInput > div > input,
+    .stTextArea textarea,
+    .stSelectbox > div > div {
+        background-color: rgba(255, 255, 255, 0.05) !important;
         color: #ffffff !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 0.5rem !important;
     }
 
-    input::placeholder, textarea::placeholder {
+    /* Dropdown text (for departments, doctors, etc.) */
+    .css-1d391kg {
+        color: white !important;
+    }
+
+    /* Placeholder text */
+    input::placeholder,
+    textarea::placeholder {
         color: #cccccc !important;
     }
 
-    .stDateInput input, .stTimeInput input {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: #ffffff !important;
-    }
-
+    /* Hide Streamlit default footer */
     #MainMenu, footer {
         visibility: hidden;
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
