@@ -147,9 +147,7 @@ if selected == "Calendar":
             "height": 600,
             "editable": False
         },
-        key="admin_calendar",
-        custom_events=True,
-        default_selected_event=None
+        key="admin_calendar"
     )
 
     if clicked_event:
