@@ -120,40 +120,47 @@ if selected == "My Health Records":
 elif selected == "Book Appointment":
     st.subheader("📅 Book a New Appointment")
 
-    # Get distinct departments
-    cursor.execute("SELECT DISTINCT department FROM approved_doctors")
-    departments = [row[0] for row in cursor.fetchall()]
-
-    selected_dept = st.selectbox("Choose Department", departments)
-
-    # Get doctors in selected department
-    cursor.execute("""
-        SELECT ad.id, u.name FROM approved_doctors ad
-        JOIN users u ON ad.id = u.id
-        WHERE ad.department = %s
-    """, (selected_dept,))
-    doctors = cursor.fetchall()
-
-    if not doctors:
-        st.warning("No doctors available in this department.")
+    patient_id = st.session_state.get("user_id")
+    if not patient_id:
+        st.error("You must be logged in to book an appointment.")
     else:
-        doc_map = {f"{name} ({doc_id})": doc_id for doc_id, name in doctors}
-        selected_doc = st.selectbox("Select Doctor", list(doc_map.keys()))
-        doctor_id = doc_map[selected_doc]
+        # 1. Get unique list of departments
+        cursor.execute("SELECT DISTINCT department FROM approved_doctors")
+        departments = [row[0] for row in cursor.fetchall()]
 
-        appt_date = st.date_input("Choose Date", min_value=date.today())
-        appt_time = st.time_input("Choose Time")
-        appt_datetime = datetime.combine(appt_date, appt_time)
+        selected_dept = st.selectbox("Choose Department", departments)
 
-        notes = st.text_area("Reason / Symptoms", placeholder="Brief description...")
-
-        if st.button("Book Appointment"):
+        if selected_dept:
+            # 2. Get available doctors in this department
             cursor.execute("""
-                INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
-                VALUES (%s, %s, %s, %s)
-            """, (user_id, doctor_id, appt_datetime, notes))
-            conn.commit()
-            st.success("Appointment booked successfully!")
+                SELECT u.id, u.name 
+                FROM users u
+                JOIN approved_doctors ad ON u.id = ad.id
+                WHERE ad.department = %s AND u.role = 'doctor'
+            """, (selected_dept,))
+            doctors = cursor.fetchall()
+
+            if not doctors:
+                st.warning("🚫 No doctors available in this department.")
+            else:
+                doc_names = {name: doc_id for doc_id, name in doctors}
+                selected_doc_name = st.selectbox("Choose Doctor", list(doc_names.keys()))
+                selected_doc_id = doc_names[selected_doc_name]
+
+                # 3. Choose date, time and reason
+                appt_date = st.date_input("Choose Date")
+                appt_time = st.time_input("Choose Time")
+                reason = st.text_area("Reason for Appointment")
+
+                if st.button("Confirm Appointment"):
+                    # Insert appointment into DB
+                    cursor.execute("""
+                        INSERT INTO appointments (patient_id, doctor_id, date, time, reason)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """, (patient_id, selected_doc_id, appt_date, appt_time, reason))
+                    conn.commit()
+                    st.success("✅ Appointment booked successfully!")
+
 
 
 elif selected == "Reports":
