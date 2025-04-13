@@ -132,52 +132,37 @@ if selected == "Calendar":
             "start": appt_time.isoformat(),
             "end": (appt_time + timedelta(minutes=30)).isoformat(),
             "extendedProps": {
-                "description": f"Patient ID: {pid} | Patient: {pname} | Doctor ID: {did} | Doctor: {dname} | Notes: {notes or 'No additional notes'}"
-
+                "patient_id": pid,
+                "patient_name": pname,
+                "doctor_id": did,
+                "doctor_name": dname,
+                "notes": notes or 'No additional notes'
             }
         })
 
-    st_cal.calendar(
+    clicked_event = st_cal.calendar(
         events=events,
         options={
             "initialView": "timeGridWeek",
             "height": 600,
-            "editable": False,
-            "eventDidMount": """
-                function(info) {
-                    const tooltip = document.createElement('div');
-                    tooltip.className = 'tooltip';
-                    tooltip.innerText = info.event.extendedProps.description;
-                    tooltip.style.position = 'absolute';
-                    tooltip.style.background = '#f8f9fa';
-                    tooltip.style.border = '1px solid #ccc';
-                    tooltip.style.padding = '5px';
-                    tooltip.style.borderRadius = '4px';
-                    tooltip.style.fontSize = '12px';
-                    tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-                    tooltip.style.pointerEvents = 'none';
-                    tooltip.style.zIndex = 1000;
-
-                    info.el.addEventListener('mouseenter', function(e) {
-                        document.body.appendChild(tooltip);
-                        tooltip.style.left = e.pageX + 10 + 'px';
-                        tooltip.style.top = e.pageY + 10 + 'px';
-                    });
-
-                    info.el.addEventListener('mousemove', function(e) {
-                        tooltip.style.left = e.pageX + 10 + 'px';
-                        tooltip.style.top = e.pageY + 10 + 'px';
-                    });
-
-                    info.el.addEventListener('mouseleave', function() {
-                        tooltip.remove();
-                    });
-                }
-            """
-
+            "editable": False
         },
-        key="admin_calendar"
+        key="admin_calendar",
+        custom_events=True,
+        default_selected_event=None
     )
+
+    if clicked_event:
+        ep = clicked_event['extendedProps']
+        st.info(f"""
+        **📌 Appointment Details:**
+
+        - 👤 **Patient ID:** {ep['patient_id']}
+        - 🧑‍⚕️ **Doctor ID:** {ep['doctor_id']}
+        - 👤 **Patient Name:** {ep['patient_name']}
+        - 🧑‍⚕️ **Doctor Name:** {ep['doctor_name']}
+        - 📝 **Notes:** {ep['notes']}
+        """)
 
 if selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
