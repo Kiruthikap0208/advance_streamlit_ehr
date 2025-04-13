@@ -37,7 +37,7 @@ def register_patient(name, email, password, dob):
     cursor = conn.cursor()
 
     # Set password for already-approved user
-    cursor.execute("SELECT id FROM users WHERE name = %s AND email = %s AND dob = %s AND role = 'patient'", (name, email, dob))
+    cursor.execute("SELECT id FROM users WHERE name = %s AND dob = %s AND role = 'patient'", (name, dob))
     result = cursor.fetchone()
 
     if result:
