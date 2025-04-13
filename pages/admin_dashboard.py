@@ -38,27 +38,29 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    /* 1. Hide the default Streamlit multipage dropdown in the sidebar */
-    div[data-testid="stSidebarNav"] > ul {
-        display: none;
+    /* Transparent form fields with white text */
+    .stTextInput > div > input,
+    .stDateInput > div > input,
+    .stTimeInput > div > input,
+    .stSelectbox > div,
+    .stTextArea > div > textarea {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }
 
-    /* 2. Make the sidebar background transparent and glassy */
-    section[data-testid="stSidebar"] {
-        background-color: rgba(0, 0, 0, 0.3) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    /* Dropdown text color */
+    .css-1n76uvr, .css-1wa3eu0 {
+        color: white !important;
     }
 
-    /* 3. Optional: Change sidebar text/icon color to white for better contrast */
-    section[data-testid="stSidebar"] * {
-        color: #ffffff !important;
-    }
-
-    /* 4. Hide Streamlit footer and main menu */
-    #MainMenu, footer {
-        visibility: hidden;
+    /* Focused input borders */
+    .stTextInput > div > input:focus,
+    .stDateInput > div > input:focus,
+    .stTimeInput > div > input:focus,
+    .stTextArea > div > textarea:focus {
+        border: 1px solid #ffffff !important;
+        box-shadow: 0 0 5px rgba(255,255,255,0.3);
     }
     </style>
 """, unsafe_allow_html=True)
