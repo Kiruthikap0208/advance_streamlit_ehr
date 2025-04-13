@@ -47,32 +47,50 @@ st.markdown("""
         backdrop-filter: blur(10px);
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     section[data-testid="stSidebar"] * {
         color: #ffffff !important;
     }
 
-    /* General text color */
+    /* Lighten main text */
     div[class^="block-container"] {
-        color: #f1f1f1 !important;
+        color: #ffffff !important;
     }
 
-    /* Transparent and styled input boxes */
-    input, textarea, select, .stTextInput input, .stDateInput input, .stSelectbox div[data-baseweb="select"] {
+    /* Make all input boxes transparent and text white */
+    input, textarea, select {
         background-color: rgba(255, 255, 255, 0.05) !important;
         color: #ffffff !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
         border-radius: 8px !important;
     }
 
-    /* Transparent dropdown menus */
-    div[data-baseweb="select"] > div {
+    /* Streamlit text_input, number_input, date_input */
+    div[data-baseweb="input"] input,
+    div[data-testid="stDateInput"] input {
         background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 8px !important;
+    }
+
+    /* Selectbox styling */
+    div[data-baseweb="select"] {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 8px !important;
+    }
+
+    /* Dropdown items */
+    div[data-baseweb="menu"] {
+        background-color: rgba(0, 0, 0, 0.6) !important;
         color: #ffffff !important;
     }
 
-    /* Button styles */
+    /* Buttons */
     button, .stButton button {
-        background-color: rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
         color: #ffffff !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
         border-radius: 6px !important;
@@ -82,6 +100,7 @@ st.markdown("""
     #MainMenu, footer { visibility: hidden; }
     </style>
 """, unsafe_allow_html=True)
+
 
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
