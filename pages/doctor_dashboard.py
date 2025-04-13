@@ -1,6 +1,6 @@
 import streamlit as st
 import mysql.connector
-from datetime import date,datetime, timedelta,
+from datetime import date,datetime, timedelta
 from streamlit_option_menu import option_menu
 from streamlit_extras.switch_page_button import switch_page
 import os
