@@ -80,8 +80,26 @@ with st.sidebar:
 
 st.title("🩺 Doctor Dashboard")
 
+user_id = st.session_state.get("user_id")
 conn = create_connection()
 cursor = conn.cursor()
+
+st.subheader("🔔 Your Appointments in Next 24 Hours")
+cursor.execute("""
+    SELECT a.appointment_time, p.name AS patient_name
+    FROM appointments a
+    JOIN users p ON a.patient_id = p.id
+    WHERE a.doctor_id = %s AND a.appointment_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
+    ORDER BY a.appointment_time
+""", (user_id,))
+
+reminders = cursor.fetchall()
+
+if reminders:
+    for appt_time, pname in reminders:
+        st.info(f"🕒 {appt_time} — with {pname}")
+else:
+    st.success("No upcoming appointments.")
 
 if selected == "Today's Appointments":
     st.subheader("📅 Today's Appointments")

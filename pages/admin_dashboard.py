@@ -2,9 +2,12 @@ import streamlit as st
 import mysql.connector
 from streamlit_option_menu import option_menu
 from datetime import date
+from datetime import datetime, timedelta
 import os
 from streamlit_extras.switch_page_button import switch_page
 import base64
+import streamlit_calendar as st_cal
+
 
 
 def create_connection():
@@ -81,9 +84,8 @@ st.markdown(f"""
 with st.sidebar:
     selected = option_menu(
         menu_title="Admin Panel",
-        options=["Dashboard", "Patients", "Doctors", "Appointments", "Reports"],
-        icons=["speedometer", "person", "person-badge", "calendar", "file-earmark-medical"],
-        menu_icon="hospital",
+        options=["Dashboard", "Patients", "Doctors", "Appointments", "Reports", "Calendar"],
+        icons=["speedometer", "people", "person-badge", "calendar", "file-earmark-medical", "calendar-event"],
         default_index=0,
         styles={
             "container": {"padding": "5px", "background-color": "rgba(0,0,0,0.2)"},
@@ -93,7 +95,7 @@ with st.sidebar:
         },
     )
     st.markdown("---")
-    if st.button("🔙 Back to Main Page"):
+    if st.button("Back to Main Page"):
         switch_page("main")
 
 
@@ -121,6 +123,27 @@ else:
     st.success("No upcoming appointments in the next 24 hours.")
 
 conn.close()
+
+if selected == "Calendar":
+    st.subheader("📆 All Scheduled Appointments")
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT a.appointment_time, p.name AS patient, d.name AS doctor
+        FROM appointments a
+        JOIN users p ON a.patient_id = p.id
+        JOIN users d ON a.doctor_id = d.id
+    """)
+    events = cursor.fetchall()
+    conn.close()
+
+    st_cal.calendar(events=[
+        {
+            "title": f"{patient} with Dr. {doctor}",
+            "start": time.isoformat(),
+            "end": (time + timedelta(minutes=30)).isoformat()
+        } for time, patient, doctor in events
+    ], defaultView='dayGridMonth', height=700)
 
 if selected == "Dashboard":
     st.subheader("📊 Overview")

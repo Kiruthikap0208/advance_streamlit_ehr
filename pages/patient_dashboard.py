@@ -1,10 +1,13 @@
 import streamlit as st
 import mysql.connector
-from datetime import date
+from datetime import datetime, timedelta, date
 from streamlit_option_menu import option_menu
 from streamlit_extras.switch_page_button import switch_page
 import os
 import base64
+import calendar
+import streamlit_calendar as st_cal
+
 
 def create_connection():
     return mysql.connector.connect(
@@ -21,32 +24,18 @@ st.set_page_config(page_title="Patient Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    /* 1. Hide the default Streamlit multipage dropdown in the sidebar */
-    div[data-testid="stSidebarNav"] > ul {
-        display: none;
-    }
-
-    /* 2. Make the sidebar background transparent and glassy */
+    div[data-testid="stSidebarNav"] > ul { display: none; }
     section[data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.3) !important;
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
-
-    /* 3. Optional: Change sidebar text/icon color to white for better contrast */
-    section[data-testid="stSidebar"] * {
-        color: #ffffff !important;
-    }
-
-    /* 4. Hide Streamlit footer and main menu */
-    #MainMenu, footer {
-        visibility: hidden;
-    }
+    section[data-testid="stSidebar"] * { color: #ffffff !important; }
+    #MainMenu, footer { visibility: hidden; }
     </style>
 """, unsafe_allow_html=True)
 
-# Set background image
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
 
@@ -67,9 +56,18 @@ with st.sidebar:
             "My Health Records",
             "Appointments",
             "Reports",
+            "Prescriptions",
+            "Book Appointment",
             "Profile & Settings"
         ],
-        icons=["clipboard-heart", "calendar", "file-earmark-medical", "person-circle"],
+        icons=[
+            "clipboard-heart",
+            "calendar",
+            "file-earmark-medical",
+            "capsule",
+            "calendar-plus",
+            "person-circle"
+        ],
         menu_icon="person",
         default_index=0
     )
@@ -79,75 +77,128 @@ with st.sidebar:
 
 st.title("👤 Patient Dashboard")
 
+user_id = st.session_state.get("user_id")
 conn = create_connection()
 cursor = conn.cursor()
 
-# Replace with session-based ID or manual input for now
-patient_id = st.text_input("Enter Your Patient ID")
+st.subheader("🔔 Your Appointments in Next 24 Hours")
+cursor.execute("""
+    SELECT a.appointment_time, d.name AS doctor_name
+    FROM appointments a
+    JOIN users d ON a.doctor_id = d.id
+    WHERE a.patient_id = %s AND a.appointment_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
+    ORDER BY a.appointment_time
+""", (user_id,))
 
-if patient_id:
-    if selected == "My Health Records":
-        st.subheader("📋 Personal Health Info")
-        cursor.execute("""
-            SELECT u.name, u.email, u.dob, p.symptoms, p.diagnosis
-            FROM users u
-            LEFT JOIN patients p ON u.id = p.id
-            WHERE u.id = %s
-        """, (patient_id,))
-        info = cursor.fetchone()
-        if info:
-            name, email, dob, symptoms, diagnosis = info
-            st.write(f"**Name:** {name}")
-            st.write(f"**Email:** {email}")
-            st.write(f"**DOB:** {dob}")
-            st.write(f"**Symptoms:** {symptoms or 'N/A'}")
-            st.write(f"**Diagnosis:** {diagnosis or 'N/A'}")
-        else:
-            st.error("Patient record not found.")
+reminders = cursor.fetchall()
 
-    elif selected == "Appointments":
-        st.subheader("📅 My Appointments")
-        cursor.execute("""
-            SELECT a.appointment_time, a.notes, u.name AS doctor_name
-            FROM appointments a
-            JOIN users u ON a.doctor_id = u.id
-            WHERE a.patient_id = %s
-            ORDER BY a.appointment_time DESC
-        """, (patient_id,))
-        appointments = cursor.fetchall()
-        for appt_time, notes, doctor_name in appointments:
-            with st.expander(f"With Dr. {doctor_name} at {appt_time}"):
-                st.write("📝 Notes:", notes)
+if reminders:
+    for appt_time, dname in reminders:
+        st.info(f"🕒 {appt_time} — with Dr. {dname}")
+else:
+    st.success("No upcoming appointments.")
 
-    elif selected == "Reports":
-        st.subheader("📂 My Medical Reports")
-        os.makedirs("reports", exist_ok=True)
-        cursor.execute("SELECT file_path, uploaded_by, uploaded_at FROM reports WHERE patient_id = %s", (patient_id,))
-        reports = cursor.fetchall()
-        for path, uploader, uploaded_at in reports:
-            with st.expander(f"Uploaded on {uploaded_at} by {uploader}"):
-                try:
-                    with open(path, "rb") as f:
-                        file_bytes = f.read()
-                    st.download_button("Download", data=file_bytes, file_name=os.path.basename(path))
-                except:
-                    st.error("File not found")
+if selected == "My Health Records":
+    st.subheader("📋 Personal Health Info")
+    cursor.execute("""
+        SELECT u.name, u.email, u.dob, p.symptoms, p.diagnosis
+        FROM users u
+        LEFT JOIN patients p ON u.id = p.id
+        WHERE u.id = %s
+    """, (user_id,))
+    info = cursor.fetchone()
+    if info:
+        name, email, dob, symptoms, diagnosis = info
+        st.write(f"**Name:** {name}")
+        st.write(f"**Email:** {email}")
+        st.write(f"**DOB:** {dob}")
+        st.write(f"**Symptoms:** {symptoms or 'N/A'}")
+        st.write(f"**Diagnosis:** {diagnosis or 'N/A'}")
+    else:
+        st.error("Patient record not found.")
 
-    elif selected == "Profile & Settings":
-        st.subheader("⚙️ Profile Settings")
-        cursor.execute("SELECT name, email, dob FROM users WHERE id = %s", (patient_id,))
-        profile = cursor.fetchone()
-        if profile:
-            name, email, dob = profile
-            new_name = st.text_input("Full Name", value=name)
-            new_email = st.text_input("Email", value=email)
-            new_dob = st.date_input("Date of Birth", value=dob)
-            if st.button("Update Profile"):
-                cursor.execute("UPDATE users SET name = %s, email = %s, dob = %s WHERE id = %s",
-                               (new_name, new_email, new_dob, patient_id))
-                conn.commit()
-                st.success("Profile updated successfully!")
-        else:
-            st.error("Profile not found.")
+elif selected == "Appointments":
+    st.subheader("📅 My Appointments")
+    cursor.execute("""
+        SELECT a.appointment_time, a.notes, u.name AS doctor_name
+        FROM appointments a
+        JOIN users u ON a.doctor_id = u.id
+        WHERE a.patient_id = %s
+        ORDER BY a.appointment_time DESC
+    """, (user_id,))
+    appointments = cursor.fetchall()
+
+    st_cal.calendar(events=[
+        {
+            "title": f"With Dr. {doctor_name}: {notes}",
+            "start": appt_time.isoformat(),
+            "end": (appt_time + timedelta(minutes=30)).isoformat()
+        } for appt_time, notes, doctor_name in appointments
+    ],
+    defaultView='timeGridWeek',
+    editable=False,
+    height=600)
+
+elif selected == "Reports":
+    st.subheader("📂 My Medical Reports")
+    os.makedirs("reports", exist_ok=True)
+    cursor.execute("SELECT file_path, uploaded_by, uploaded_at FROM reports WHERE patient_id = %s", (user_id,))
+    reports = cursor.fetchall()
+    for path, uploader, uploaded_at in reports:
+        with st.expander(f"Uploaded on {uploaded_at} by {uploader}"):
+            try:
+                with open(path, "rb") as f:
+                    file_bytes = f.read()
+                st.download_button("Download", data=file_bytes, file_name=os.path.basename(path))
+            except:
+                st.error("File not found")
+
+elif selected == "Prescriptions":
+    st.subheader("💊 My Prescriptions")
+    cursor.execute("SELECT medicine, dosage, instructions, date_issued FROM prescriptions WHERE patient_id = %s", (user_id,))
+    prescriptions = cursor.fetchall()
+    for med, dose, instr, date_issued in prescriptions:
+        with st.expander(f"{med} - {date_issued}"):
+            st.write(f"**Dosage:** {dose}")
+            st.write(f"**Instructions:** {instr}")
+
+elif selected == "Book Appointment":
+    st.subheader("📆 Book New Appointment")
+    cursor.execute("SELECT id, name FROM users WHERE role='doctor'")
+    doctors = cursor.fetchall()
+    doc_dict = {f"{name} ({doc_id})": doc_id for doc_id, name in doctors}
+
+    with st.form("book_appt_form"):
+        doc_choice = st.selectbox("Choose Doctor", list(doc_dict.keys()))
+        date_choice = st.date_input("Preferred Date", min_value=date.today())
+        time_choice = st.time_input("Preferred Time")
+        notes = st.text_area("Any specific notes or symptoms?")
+        submit = st.form_submit_button("Book Appointment")
+
+        if submit:
+            datetime_combined = f"{date_choice} {time_choice}"
+            cursor.execute("""
+                INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
+                VALUES (%s, %s, %s, %s)
+            """, (user_id, doc_dict[doc_choice], datetime_combined, notes))
+            conn.commit()
+            st.success("Appointment booked successfully!")
+
+elif selected == "Profile & Settings":
+    st.subheader("⚙️ Profile Settings")
+    cursor.execute("SELECT name, email, dob FROM users WHERE id = %s", (user_id,))
+    profile = cursor.fetchone()
+    if profile:
+        name, email, dob = profile
+        new_name = st.text_input("Full Name", value=name)
+        new_email = st.text_input("Email", value=email)
+        new_dob = st.date_input("Date of Birth", value=dob)
+        if st.button("Update Profile"):
+            cursor.execute("UPDATE users SET name = %s, email = %s, dob = %s WHERE id = %s",
+                           (new_name, new_email, new_dob, user_id))
+            conn.commit()
+            st.success("Profile updated successfully!")
+    else:
+        st.error("Profile not found.")
 
 conn.close()

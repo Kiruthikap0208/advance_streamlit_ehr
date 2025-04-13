@@ -108,6 +108,7 @@ with col3:
             st.success("Login successful!")
             st.session_state.logged_in = True
             st.session_state.user_email = email
+            st.session_state.user_id = user[0]
             switch_page("doctor dashboard")
         else:
             st.error("Invalid credentials or not a doctor.")
