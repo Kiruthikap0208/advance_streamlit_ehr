@@ -9,12 +9,12 @@ from streamlit_extras.switch_page_button import switch_page
 # ---------------- DB CONNECTION ----------------
 def create_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Nk258627",
-        database="srm_ehr",
-        auth_plugin="mysql_native_password"
+        host=st.secrets["mysql"]["host"],
+        user=st.secrets["mysql"]["user"],
+        password=st.secrets["mysql"]["password"],
+        database=st.secrets["mysql"]["database"]
     )
+
 
 def user_exists(email):
     conn = create_connection()
