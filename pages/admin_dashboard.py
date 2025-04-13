@@ -38,42 +38,39 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    /* Make input widgets transparent with white text */
+    /* Transparent widget boxes with white text */
     .stSelectbox > div, .stDateInput > div, .stTimeInput > div, .stTextArea > div, .stTextInput > div, .stButton > button {
-        background-color: rgba(255, 255, 255, 0.05) !important;
+        background-color: rgba(255, 255, 255, 0.02) !important;
         color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
         border-radius: 8px;
     }
 
-    /* Ensure dropdown items and calendar popups are also styled */
-    .css-1wa3eu0, .css-1n76uvr {
-        background-color: rgba(0, 0, 0, 0.7) !important;
-        color: white !important;
-    }
-
+    /* Ensure inner input areas are also transparent and white */
     .stTextArea textarea, .stTextInput input {
         background-color: transparent !important;
         color: white !important;
     }
 
-    /* White label text */
-    label, .st-bb, .st-c6 {
+    /* Dropdown and calendar popup styling */
+    .css-1wa3eu0, .css-1n76uvr {
+        background-color: rgba(0, 0, 0, 0.6) !important;
         color: white !important;
     }
 
-    /* Success messages and text outputs */
-    .stAlert, .stMarkdown {
+    /* Label and text color fix */
+    label, .st-bb, .st-c6, .css-145kmo2, .css-10trblm {
         color: white !important;
     }
 
-    /* Button hover effect */
+    /* Button hover effect for better interaction */
     .stButton > button:hover {
-        background-color: rgba(255, 255, 255, 0.2) !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
         color: white !important;
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 # Set background image
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
