@@ -118,37 +118,22 @@ if selected == "My Health Records":
         st.error("Patient record not found.")
 
 if selected == "Appointments":
-    st.subheader("📅 My Appointments (Calendar View)")
+    st.subheader("🗕️ My Appointments (Calendar View)")
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT a.appointment_time, u.name AS doctor_name
+        SELECT a.id, a.appointment_time, a.notes,
+               d.id AS doctor_id, d.name AS doctor_name
         FROM appointments a
-        JOIN users u ON a.doctor_id = u.id
+        JOIN users d ON a.doctor_id = d.id
         WHERE a.patient_id = %s
     """, (user_id,))
     appointments = cursor.fetchall()
 
-    st.subheader("📅 Your Appointments Calendar")
-
-    conn = create_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT a.id, a.appointment_time, a.notes,
-               p.id AS patient_id, p.name AS patient_name,
-               d.id AS doctor_id, d.name AS doctor_name
-        FROM appointments a
-        JOIN users p ON a.patient_id = p.id
-        JOIN users d ON a.doctor_id = d.id
-        WHERE a.patient_id = %s
-    """, (st.session_state["user_id"],))
-    appointments = cursor.fetchall()
-
     events = []
     event_lookup = {}
-    for aid, appt_time, notes, pid, pname, did, dname in appointments:
+    for aid, appt_time, notes, did, dname in appointments:
         short_note = (notes[:40] + '...') if notes and len(notes) > 40 else (notes or 'N/A')
-        title = f"DID: {did} | 🕒 {appt_time.strftime('%H:%M')}\n📝 {short_note}"
+        title = f"DID: {did} | 🕒 {appt_time.strftime('%H:%M')}\n📜 {short_note}"
         event = {
             "id": str(aid),
             "title": title,
@@ -166,7 +151,7 @@ if selected == "Appointments":
     clicked = st_cal.calendar(
         events=events,
         options={
-            "initialView": "TimeGridDay",
+            "initialView": "timeGridDay",
             "editable": False,
             "eventDisplay": "block",
             "eventMaxLines": 4,
@@ -180,6 +165,7 @@ if selected == "Appointments":
             st.success("📌 Appointment Details")
             for key, value in event_lookup[appt_id].items():
                 st.markdown(f"**{key}:** {value}")
+
 elif selected == "Reports":
     st.subheader("📂 My Medical Reports")
     os.makedirs("reports", exist_ok=True)
