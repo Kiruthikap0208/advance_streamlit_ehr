@@ -38,6 +38,13 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
+    /* 1. Hide the default Streamlit multipage dropdown in the sidebar */
+    div[data-testid="stSidebarNav"] > ul {
+        display: none;
+    }
+    .stApp {
+        color: white !important;
+    }
     /* 2. Make the sidebar background transparent and glassy */
     section[data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.3) !important;
@@ -45,25 +52,13 @@ st.markdown("""
         -webkit-backdrop-filter: blur(10px) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
-    section[data-testid="stSidebar"] * {
-        color: white !important;
-    }
-    div[data-testid="stSidebarNav"] > ul {
-        display: none;
-    }
-    .stApp {
-        color: white !important;
-    }
-    input, textarea, select {
-        background-color: rgba(255, 255, 255, 0.15) !important;
-        color: white !important;
-        border: 1px solid white !important;
-    }
     button[kind="primary"], button[kind="secondary"] {
         background-color: rgba(255, 255, 255, 0.15) !important;
         color: white !important;
         border: 1px solid white !important;
     }
+
+    /* 4. Hide Streamlit footer and main menu */
     #MainMenu, footer {
         visibility: hidden;
     }

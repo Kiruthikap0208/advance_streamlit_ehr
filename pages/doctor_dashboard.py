@@ -26,7 +26,9 @@ st.markdown("""
     div[data-testid="stSidebarNav"] > ul {
         display: none;
     }
-
+    .stApp {
+        color: white !important;
+    }
     /* 2. Make the sidebar background transparent and glassy */
     section[data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.3) !important;
