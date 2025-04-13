@@ -38,38 +38,50 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    /* Transparent widget boxes with white text */
-    .stSelectbox > div, .stDateInput > div, .stTimeInput > div, .stTextArea > div, .stTextInput > div, .stButton > button {
-        background-color: rgba(255, 255, 255, 0.02) !important;
-        color: black !important;
-        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    /* Set all text color to white */
+    html, body, [class*="css"] {
+        color: white !important;
+    }
+
+    /* Make widget containers 75% transparent */
+    .stSelectbox > div, .stDateInput > div, .stTimeInput > div,
+    .stTextInput > div, .stTextArea > div, .stButton > button {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white !important;
         border-radius: 8px;
     }
 
-    /* Ensure inner input areas are also transparent and white */
-    .stTextArea textarea, .stTextInput input {
+    /* Inputs inside widgets */
+    .stTextInput input, .stTextArea textarea {
         background-color: transparent !important;
-        color: black !important;
+        color: white !important;
     }
 
-    /* Dropdown and calendar popup styling */
-    .css-1wa3eu0, .css-1n76uvr {
+    /* Dropdown and calendar popups */
+    .css-1wa3eu0, .css-1n76uvr, .css-1dimb5e {
         background-color: rgba(0, 0, 0, 0.6) !important;
-        color: black !important;
+        color: white !important;
     }
 
-    /* Label and text color fix */
+    /* Labels and other inline elements */
     label, .st-bb, .st-c6, .css-145kmo2, .css-10trblm {
         color: white !important;
     }
 
-    /* Button hover effect for better interaction */
+    /* Button hover and interaction style */
     .stButton > button:hover {
-        background-color: rgba(255, 255, 255, 0.08) !important;
+        background-color: rgba(255, 255, 255, 0.2) !important;
         color: white !important;
+    }
+
+    /* Hide Streamlit default menu and footer */
+    #MainMenu, header, footer {
+        visibility: hidden;
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 # Set background image
