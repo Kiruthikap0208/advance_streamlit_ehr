@@ -117,54 +117,44 @@ if selected == "My Health Records":
     else:
         st.error("Patient record not found.")
 
-if selected == "Appointments":
-    st.subheader("🗕️ My Appointments (Calendar View)")
-    cursor = conn.cursor()
+elif selected == "Book Appointment":
+    st.subheader("📅 Book a New Appointment")
+
+    # Get distinct departments
+    cursor.execute("SELECT DISTINCT department FROM approved_doctors")
+    departments = [row[0] for row in cursor.fetchall()]
+
+    selected_dept = st.selectbox("Choose Department", departments)
+
+    # Get doctors in selected department
     cursor.execute("""
-        SELECT a.id, a.appointment_time, a.notes,
-               d.id AS doctor_id, d.name AS doctor_name
-        FROM appointments a
-        JOIN users d ON a.doctor_id = d.id
-        WHERE a.patient_id = %s
-    """, (user_id,))
-    appointments = cursor.fetchall()
+        SELECT ad.id, u.name FROM approved_doctors ad
+        JOIN users u ON ad.id = u.id
+        WHERE ad.department = %s
+    """, (selected_dept,))
+    doctors = cursor.fetchall()
 
-    events = []
-    event_lookup = {}
-    for aid, appt_time, notes, did, dname in appointments:
-        short_note = (notes[:40] + '...') if notes and len(notes) > 40 else (notes or 'N/A')
-        title = f"DID: {did} | 🕒 {appt_time.strftime('%H:%M')}\n📜 {short_note}"
-        event = {
-            "id": str(aid),
-            "title": title,
-            "start": appt_time.isoformat(),
-            "end": (appt_time + timedelta(minutes=30)).isoformat()
-        }
-        events.append(event)
-        event_lookup[str(aid)] = {
-            "Doctor ID": did,
-            "Doctor Name": dname,
-            "Appointment Time": appt_time.strftime("%Y-%m-%d %H:%M"),
-            "Notes": notes or "No notes"
-        }
+    if not doctors:
+        st.warning("No doctors available in this department.")
+    else:
+        doc_map = {f"{name} ({doc_id})": doc_id for doc_id, name in doctors}
+        selected_doc = st.selectbox("Select Doctor", list(doc_map.keys()))
+        doctor_id = doc_map[selected_doc]
 
-    clicked = st_cal.calendar(
-        events=events,
-        options={
-            "initialView": "timeGridDay",
-            "editable": False,
-            "eventDisplay": "block",
-            "eventMaxLines": 4,
-            "height": 850,
-        }
-    )
+        appt_date = st.date_input("Choose Date", min_value=date.today())
+        appt_time = st.time_input("Choose Time")
+        appt_datetime = datetime.combine(appt_date, appt_time)
 
-    if clicked and "event" in clicked:
-        appt_id = clicked["event"].get("id")
-        if appt_id and appt_id in event_lookup:
-            st.success("📌 Appointment Details")
-            for key, value in event_lookup[appt_id].items():
-                st.markdown(f"**{key}:** {value}")
+        notes = st.text_area("Reason / Symptoms", placeholder="Brief description...")
+
+        if st.button("Book Appointment"):
+            cursor.execute("""
+                INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
+                VALUES (%s, %s, %s, %s)
+            """, (user_id, doctor_id, appt_datetime, notes))
+            conn.commit()
+            st.success("Appointment booked successfully!")
+
 
 elif selected == "Reports":
     st.subheader("📂 My Medical Reports")
@@ -189,27 +179,36 @@ elif selected == "Prescriptions":
             st.write(f"**Dosage:** {dose}")
             st.write(f"**Instructions:** {instr}")
 
-elif selected == "Book Appointment":
-    st.subheader("📆 Book New Appointment")
-    cursor.execute("SELECT id, name FROM users WHERE role='doctor'")
-    doctors = cursor.fetchall()
-    doc_dict = {f"{name} ({doc_id})": doc_id for doc_id, name in doctors}
+elif selected == "Appointments":
+    st.subheader("📋 My Appointments")
 
-    with st.form("book_appt_form"):
-        doc_choice = st.selectbox("Choose Doctor", list(doc_dict.keys()))
-        date_choice = st.date_input("Preferred Date", min_value=date.today())
-        time_choice = st.time_input("Preferred Time")
-        notes = st.text_area("Any specific notes or symptoms?")
-        submit = st.form_submit_button("Book Appointment")
+    cursor.execute("""
+        SELECT a.id, a.appointment_time, a.notes,
+               d.name AS doctor_name, ad.department
+        FROM appointments a
+        JOIN users d ON a.doctor_id = d.id
+        JOIN approved_doctors ad ON d.id = ad.id
+        WHERE a.patient_id = %s
+        ORDER BY a.appointment_time DESC
+    """, (user_id,))
+    rows = cursor.fetchall()
 
-        if submit:
-            datetime_combined = f"{date_choice} {time_choice}"
-            cursor.execute("""
-                INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
-                VALUES (%s, %s, %s, %s)
-            """, (user_id, doc_dict[doc_choice], datetime_combined, notes))
-            conn.commit()
-            st.success("Appointment booked successfully!")
+    if not rows:
+        st.info("You have no appointments yet.")
+    else:
+        for appt_id, appt_time, notes, doctor_name, department in rows:
+            is_future = appt_time > datetime.now()
+            color = "green" if is_future else "gray"
+
+            with st.container():
+                st.markdown(f"""
+                    <div style='border-left: 5px solid {color}; padding-left: 10px; margin-bottom: 15px;'>
+                        <strong>Doctor:</strong> {doctor_name} ({department})<br>
+                        <strong>Date & Time:</strong> {appt_time.strftime("%Y-%m-%d %H:%M")}<br>
+                        <strong>Notes:</strong> {notes or '—'}
+                    </div>
+                """, unsafe_allow_html=True)
+
 
 elif selected == "Profile & Settings":
     st.subheader("⚙️ Profile Settings")

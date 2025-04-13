@@ -118,24 +118,24 @@ else:
 if selected == "Calendar":
     st.subheader("📅 Appointments Calendar")
 
-    conn = create_connection()
-    cursor = conn.cursor()
     cursor.execute("""
         SELECT a.id, a.appointment_time, a.notes,
-            p.id AS patient_id, p.name AS patient_name,
-            d.id AS doctor_id, d.name AS doctor_name
+               p.id AS patient_id, p.name AS patient_name,
+               d.id AS doctor_id, d.name AS doctor_name,
+               ad.department
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
+        JOIN approved_doctors ad ON d.id = ad.id
         WHERE a.doctor_id = %s
     """, (user_id,))
     appointments = cursor.fetchall()
 
     events = []
     event_lookup = {}
-    for aid, appt_time, notes, pid, pname, did, dname in appointments:
-        short_note = (notes[:40] + '...') if notes and len(notes) > 40 else (notes or 'N/A')
-        title = f"PID: {pid} | 🕒 {appt_time.strftime('%H:%M')}\n📝 {short_note}"
+
+    for aid, appt_time, notes, pid, pname, did, dname, dept in appointments:
+        title = f"👤 {pname} | 🏥 Dept: {dept}\n🕒 {appt_time.strftime('%H:%M')} | 📝 {notes or 'No notes'}"
         event = {
             "id": str(aid),
             "title": title,
@@ -146,8 +146,8 @@ if selected == "Calendar":
         event_lookup[str(aid)] = {
             "Patient ID": pid,
             "Patient Name": pname,
-            "Doctor ID": did,
             "Doctor Name": dname,
+            "Department": dept,
             "Appointment Time": appt_time.strftime("%Y-%m-%d %H:%M"),
             "Notes": notes or "No notes"
         }
@@ -169,6 +169,7 @@ if selected == "Calendar":
             st.success("📌 Appointment Details")
             for key, value in event_lookup[appt_id].items():
                 st.markdown(f"**{key}:** {value}")
+
 
 if selected == "Today's Appointments":
     st.subheader("📅 Today's Appointments")
@@ -266,22 +267,39 @@ elif selected == "Prescriptions":
         st.success("Prescription saved as report!")
 
 elif selected == "Profile & Settings":
-    st.subheader("⚙️ Profile Settings")
-    doc_id = st.text_input("Enter your Doctor ID")
-    if st.button("Load Profile") and doc_id:
-        cursor.execute("SELECT name, email, dob FROM users WHERE id = %s AND role = 'doctor'", (doc_id,))
+    st.subheader("⚙️ Profile & Settings")
+
+    if not user_id:
+        st.error("No doctor is logged in.")
+    else:
+        # Fetch info from users and approved_doctors
+        cursor.execute("""
+            SELECT u.name, u.email, u.dob, ad.department, ad.room, ad.building
+            FROM users u
+            JOIN approved_doctors ad ON u.id = ad.id
+            WHERE u.id = %s AND u.role = 'doctor'
+        """, (user_id,))
         result = cursor.fetchone()
+
         if result:
-            name, email, dob = result
+            name, email, dob, dept, room, building = result
+
             new_name = st.text_input("Full Name", value=name)
             new_email = st.text_input("Email", value=email)
             new_dob = st.date_input("Date of Birth", value=dob)
+
+            st.markdown("### 🏥 Department & Assignment Info")
+            st.info(f"**Department:** {dept}")
+            st.info(f"**Room:** {room}")
+            st.info(f"**Building:** {building}")
+
             if st.button("Update Profile"):
                 cursor.execute("UPDATE users SET name = %s, email = %s, dob = %s WHERE id = %s",
-                               (new_name, new_email, new_dob, doc_id))
+                               (new_name, new_email, new_dob, user_id))
                 conn.commit()
                 st.success("Profile updated successfully!")
         else:
-            st.error("Doctor not found or invalid ID")
+            st.error("Doctor not found.")
+
 
 conn.close()
