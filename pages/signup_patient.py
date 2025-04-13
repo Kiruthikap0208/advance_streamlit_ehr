@@ -32,12 +32,12 @@ def is_approved_patient(name, dob):
     conn.close()
     return result is not None
 
-def register_patient(name, email, password):
+def register_patient(name, email, password, dob):
     conn = create_connection()
     cursor = conn.cursor()
 
     # Set password for already-approved user
-    cursor.execute("SELECT id FROM users WHERE name = %s AND email = %s AND role = 'patient'", (name, email))
+    cursor.execute("SELECT id FROM users WHERE name = %s AND email = %s AND dob = %s AND role = 'patient'", (name, email, dob))
     result = cursor.fetchone()
 
     if result:
