@@ -64,6 +64,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 with st.sidebar:
+    st.markdown("---")
     selected = option_menu(
         menu_title=None,
         options=[

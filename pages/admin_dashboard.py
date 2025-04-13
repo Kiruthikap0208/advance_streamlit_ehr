@@ -84,6 +84,7 @@ st.markdown(f"""
 # Sidebar menu
 # Sidebar with transparent background
 with st.sidebar:
+    st.markdown("---")
     selected = option_menu(
         menu_title=None,
         options=["Dashboard", "Patients", "Doctors", "Departments", "Appointments", "Reports", "Calendar"],
@@ -91,7 +92,7 @@ with st.sidebar:
         menu_icon="hospital",
         default_index=0
     )
-    st.markdown("---")
+        
     if st.button("🔙 Back to Main Page"):
         switch_page("main")
 
