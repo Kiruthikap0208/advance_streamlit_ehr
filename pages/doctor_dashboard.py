@@ -266,17 +266,17 @@ elif selected == "Prescriptions":
         conn.commit()
         st.success("Prescription saved as report!")
 
-elif selected == "Profile & Settings":
+elif selected == "Profile & Settings": 
     st.subheader("⚙️ Profile & Settings")
 
     if not user_id:
         st.error("No doctor is logged in.")
     else:
-        # Fetch info from users and approved_doctors
+        # Fetch data from users and approved_doctors by matching email
         cursor.execute("""
             SELECT u.name, u.email, u.dob, ad.department, ad.room, ad.building
             FROM users u
-            JOIN approved_doctors ad ON u.id = ad.id
+            JOIN approved_doctors ad ON u.email = ad.email
             WHERE u.id = %s AND u.role = 'doctor'
         """, (user_id,))
         result = cursor.fetchone()
@@ -284,22 +284,27 @@ elif selected == "Profile & Settings":
         if result:
             name, email, dob, dept, room, building = result
 
-            new_name = st.text_input("Full Name", value=name)
-            new_email = st.text_input("Email", value=email)
-            new_dob = st.date_input("Date of Birth", value=dob)
+            # Editable user fields
+            new_name = st.text_input("👤 Full Name", value=name)
+            new_email = st.text_input("📧 Email", value=email)
+            new_dob = st.date_input("🎂 Date of Birth", value=dob if isinstance(dob, date) else date.today())
 
-            st.markdown("### 🏥 Department & Assignment Info")
+            # Static department and assignment info
+            st.markdown("### 🏥 Department Assignment")
             st.info(f"**Department:** {dept}")
-            st.info(f"**Room:** {room}")
+            st.info(f"**Room No.:** {room}")
             st.info(f"**Building:** {building}")
 
-            if st.button("Update Profile"):
+            if st.button("💾 Update Profile"):
                 cursor.execute("UPDATE users SET name = %s, email = %s, dob = %s WHERE id = %s",
                                (new_name, new_email, new_dob, user_id))
+                cursor.execute("UPDATE approved_doctors SET name = %s, email = %s WHERE email = %s",
+                               (new_name, new_email, email))  # update based on original email
                 conn.commit()
-                st.success("Profile updated successfully!")
+                st.success("✅ Profile updated successfully!")
         else:
-            st.error("Doctor not found.")
+            st.error("❌ Doctor record not found or mismatched in approved_doctors.")
+
 
 
 conn.close()
