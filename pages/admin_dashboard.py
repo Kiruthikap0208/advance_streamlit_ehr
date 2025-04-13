@@ -132,11 +132,8 @@ if selected == "Calendar":
             "start": appt_time.isoformat(),
             "end": (appt_time + timedelta(minutes=30)).isoformat(),
             "extendedProps": {
-                "description": f"""
-                Patient ID: {pid}\n
-                Doctor ID: {did}\n
-                Notes: {notes or 'No additional notes'}
-                """
+                "description": f"Patient ID: {pid} | Patient: {pname} | Doctor ID: {did} | Doctor: {dname} | Notes: {notes or 'No additional notes'}"
+
             }
         })
 
@@ -146,7 +143,7 @@ if selected == "Calendar":
             "initialView": "timeGridWeek",
             "height": 600,
             "editable": False,
-            "eventMouseEnter": """
+            "eventDidMount": """
                 function(info) {
                     const tooltip = document.createElement('div');
                     tooltip.className = 'tooltip';
@@ -160,20 +157,24 @@ if selected == "Calendar":
                     tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
                     tooltip.style.pointerEvents = 'none';
                     tooltip.style.zIndex = 1000;
-                    document.body.appendChild(tooltip);
-                    function moveTooltip(e) {
+
+                    info.el.addEventListener('mouseenter', function(e) {
+                        document.body.appendChild(tooltip);
                         tooltip.style.left = e.pageX + 10 + 'px';
                         tooltip.style.top = e.pageY + 10 + 'px';
-                    }
-                    function removeTooltip() {
+                    });
+
+                    info.el.addEventListener('mousemove', function(e) {
+                        tooltip.style.left = e.pageX + 10 + 'px';
+                        tooltip.style.top = e.pageY + 10 + 'px';
+                    });
+
+                    info.el.addEventListener('mouseleave', function() {
                         tooltip.remove();
-                        info.el.removeEventListener('mousemove', moveTooltip);
-                        info.el.removeEventListener('mouseleave', removeTooltip);
-                    }
-                    info.el.addEventListener('mousemove', moveTooltip);
-                    info.el.addEventListener('mouseleave', removeTooltip);
+                    });
                 }
             """
+
         },
         key="admin_calendar"
     )
