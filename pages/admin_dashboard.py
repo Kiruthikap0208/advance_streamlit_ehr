@@ -132,8 +132,8 @@ if selected == "Calendar":
     events = []
     event_lookup = {}
     for aid, appt_time, notes, pid, pname, did, dname in appointments:
-        short_note = (notes[:20] + '...') if notes and len(notes) > 20 else (notes or 'N/A')
-        title = f"PID: {pid} | DID: {did} | ⏰ {appt_time.strftime('%H:%M')} | 📝 {short_note}"
+        short_note = (notes[:40] + '...') if notes and len(notes) > 40 else (notes or 'N/A')
+        title = f"PID: {pid} | DID: {did} | 🕒 {appt_time.strftime('%H:%M')}\n📝 {short_note}"
         event = {
             "id": str(aid),
             "title": title,
@@ -153,10 +153,10 @@ if selected == "Calendar":
         options={
             "initialView": "timeGridWeek",
             "editable": False,
-            "eventDisplay": "list-item",
-            "eventMaxLines": 3
+            "eventDisplay": "block",
+            "eventMaxLines": 4
         },
-        height = 1000
+        height=950  # Ensure this is outside options
     )
 
     if clicked and "event" in clicked:
@@ -165,6 +165,7 @@ if selected == "Calendar":
             st.success("📌 Appointment Details")
             for key, value in event_lookup[appt_id].items():
                 st.markdown(f"**{key}:** {value}")
+
 
 elif selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
