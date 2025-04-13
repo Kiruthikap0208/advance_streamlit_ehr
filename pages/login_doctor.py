@@ -22,6 +22,36 @@ def validate_user(email, password):
 
 st.set_page_config(page_title="login doctor", layout="wide")
 
+# Place this at the top of your Streamlit script
+st.markdown("""
+    <style>
+        .custom-top-left {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+        }
+        .custom-top-left button {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: black;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: 0.3s ease-in-out;
+        }
+        .custom-top-left button:hover {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+        }
+    </style>
+
+    <div class="custom-top-left">
+        <form action="/" method="get">
+            <button type="submit">🔙 Back to Main</button>
+        </form>
+    </div>
+""", unsafe_allow_html=True)
+
 # Hide sidebar and header/footer
 st.markdown("""
     <style>
@@ -76,7 +106,7 @@ with col3:
             st.success("Login successful!")
             st.session_state.logged_in = True
             st.session_state.user_email = email
-            switch_page("dashboard doctor")
+            switch_page("doctor dashboard")
         else:
             st.error("Invalid credentials or not a doctor.")
             

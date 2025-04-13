@@ -17,10 +17,11 @@ def create_connection():
 def user_exists(email):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-    exists = cursor.fetchone() is not None
+    cursor.execute("SELECT password FROM users WHERE email = %s", (email,))
+    result = cursor.fetchone()
     conn.close()
-    return exists
+    return result is not None and result[0] is not None
+
 
 def is_approved_doctor(name, dob):
     conn = create_connection()
@@ -30,13 +31,24 @@ def is_approved_doctor(name, dob):
     conn.close()
     return approved
 
-def register_doctor(name, email, password):
+def register_doctor(name, email, password, dob):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO users (name, email, password, role) VALUES (%s, %s, %s, 'doctor')",
-                   (name, email, password))
-    conn.commit()
+
+    # Check for pre-approval
+    cursor.execute("SELECT id FROM users WHERE name = %s AND dob = %s AND role = 'doctor'", (name, dob))
+    result = cursor.fetchone()
+
+    if result:
+        doctor_id = result[0]
+        # Set password if not already set
+        cursor.execute("UPDATE users SET password = %s WHERE id = %s", (password, doctor_id))
+        conn.commit()
+    else:
+        st.error("You're not approved by the hospital. Please contact admin.")
+    
     conn.close()
+
 
 # -------- PAGE SETUP --------
 st.set_page_config(page_title="signup doctor", layout="wide")
@@ -103,9 +115,10 @@ with col3:
         elif not is_approved_doctor(name, dob):
             st.error("❌ You’re not approved by the hospital. Please contact admin.")
         else:
-            register_doctor(name, email, password)
+            register_doctor(name, email, password, dob)
             st.success("✅ Account created successfully!")
-            switch_page("login doctor")
+            if st.button("🔐 Go to Login Page"):
+                switch_page("login doctor")
 
     if st.button("Already have an account? Log in"):
         switch_page("login doctor")

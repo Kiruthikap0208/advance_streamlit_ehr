@@ -16,10 +16,11 @@ def create_connection():
 def user_exists(email):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-    exists = cursor.fetchone() is not None
+    cursor.execute("SELECT password FROM users WHERE email = %s", (email,))
+    result = cursor.fetchone()
     conn.close()
-    return exists
+    return result is not None and result[0] is not None
+
 
 def is_approved_admin(name, dob):
     conn = create_connection()
@@ -32,9 +33,18 @@ def is_approved_admin(name, dob):
 def register_admin(name, email, password):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO users (name, email, password, role) VALUES (%s, %s, %s, 'admin')",
-                   (name, email, password))
-    conn.commit()
+
+    # Set password for already-approved admin
+    cursor.execute("SELECT id FROM users WHERE name = %s AND email = %s AND role = 'admin'", (name, email))
+    result = cursor.fetchone()
+
+    if result:
+        admin_id = result[0]
+        cursor.execute("UPDATE users SET password = %s WHERE id = %s", (password, admin_id))
+        conn.commit()
+    else:
+        st.error("Admin not found or not approved.")
+
     conn.close()
 
 st.set_page_config(page_title="signup admin", layout="wide")
@@ -103,6 +113,8 @@ with col3:
             register_admin(name, email, password)
             st.success("\u2705 Account created successfully!")
             switch_page("login admin")
+            if st.button("🔐 Go to Login Page"):
+                switch_page("login patient")
 
     if st.button("Already have an account? Log in"):
         switch_page("login admin")

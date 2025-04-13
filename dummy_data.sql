@@ -1,13 +1,12 @@
 
 
 -- Insert dummy users
-INSERT INTO users (name, email, password, role) VALUES
-('Dr. Arjun Mehta', 'arjun.mehta@hospital.com', 'doc123', 'doctor'),
-('Dr. Priya Sharma', 'priya.sharma@hospital.com', 'doc456', 'doctor'),
-('Ravi Kumar', 'ravi.admin@hospital.com', 'admin123', 'admin'),
-('Neha Joshi', 'neha.admin@hospital.com', 'admin456', 'admin'),
-('Patient One', 'patient1@gmail.com', 'pass1', 'patient'),
-('Patient Two', 'patient2@gmail.com', 'pass2', 'patient');
+INSERT INTO users (name, email, dob, role)
+VALUES 
+  ('Alice Smith', 'alice@example.com', '1990-05-12', 'patient'),
+  ('Dr. John Doe', 'john.doe@example.com', '1980-11-20', 'doctor'),
+  ('Admin Jane', 'admin.jane@example.com', '1975-02-28', 'admin');
+
 
 
 
