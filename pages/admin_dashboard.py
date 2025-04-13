@@ -132,7 +132,7 @@ if selected == "Calendar":
     events = []
     event_lookup = {}
     for aid, appt_time, notes, pid, pname, did, dname in appointments:
-        title = f"🧑 PID: {pid} | 👨‍⚕️ DID: {did} | ⏰ {appt_time.strftime('%H:%M')}\n📝 {notes or 'N/A'}"
+        title = f"🧑 PID: {pid}<br>👨‍⚕️ DID: {did}<br>⏰ {appt_time.strftime('%H:%M')}<br>📝 {notes or 'N/A'}"
         event = {
             "id": str(aid),
             "title": title,
@@ -153,8 +153,9 @@ if selected == "Calendar":
             "initialView": "timeGridWeek",
             "height": 650,
             "editable": False,
-            "eventDisplay": "block",
-            "eventMaxLines": 3
+            "eventDisplay": "auto",
+            "eventContent": lambda event: event.event.title.replace("\\n", "<br>"),
+
         }
     )
 
