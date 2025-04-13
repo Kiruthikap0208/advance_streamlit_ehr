@@ -126,7 +126,6 @@ conn.close()
 
 if selected == "Calendar":
     st.subheader("📅 All Appointments Calendar")
-    cursor = conn.cursor()
     cursor.execute("""
         SELECT a.appointment_time, u1.name AS patient_name, u2.name AS doctor_name
         FROM appointments a
