@@ -38,59 +38,17 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    /* Sidebar transparency and text */
-    div[data-testid="stSidebarNav"] > ul {
-        display: none;
-    }
+    div[data-testid="stSidebarNav"] > ul { display: none; }
     section[data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.3) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
+        backdrop-filter: blur(10px);
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
-    section[data-testid="stSidebar"] * {
-        color: #ffffff !important;
-    }
-
-    /* Main content text */
-    .stApp * {
-        color: #f8f9fa !important;
-    }
-
-    /* Transparent and styled inputs */
-    input, textarea, select {
-        background-color: rgba(255, 255, 255, 0.07) !important;
-        color: #f1f1f1 !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        border-radius: 0.5rem !important;
-        padding: 0.5rem !important;
-    }
-
-    /* Placeholder text in inputs */
-    input::placeholder, textarea::placeholder {
-        color: #bbbbbb !important;
-    }
-
-    /* Drop-down arrow color for select */
-    select option {
-        background-color: rgba(0, 0, 0, 0.8);
-        color: white;
-    }
-
-    /* Optional: styling button */
-    button[kind="primary"] {
-        background-color: #0a84ff !important;
-        color: white !important;
-        border-radius: 0.5rem !important;
-    }
-
-    /* Hide menu and footer */
-    #MainMenu, footer {
-        visibility: hidden;
-    }
+    section[data-testid="stSidebar"] * { color: #ffffff !important; }
+    #MainMenu, footer { visibility: hidden; }
     </style>
-""", unsafe_allow_html=True)
 
+""", unsafe_allow_html=True)
 
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
