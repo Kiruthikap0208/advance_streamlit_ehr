@@ -99,6 +99,29 @@ with st.sidebar:
 
 st.title("🏥 Admin Dashboard")
 
+# 🔔 Reminders Section
+conn = create_connection()
+cursor = conn.cursor()
+
+st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
+cursor.execute("""
+    SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name
+    FROM appointments a
+    JOIN users p ON a.patient_id = p.id
+    JOIN users d ON a.doctor_id = d.id
+    WHERE a.appointment_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
+    ORDER BY a.appointment_time
+""")
+reminders = cursor.fetchall()
+
+if reminders:
+    for appt_time, pname, dname in reminders:
+        st.info(f"🕒 {appt_time} — {pname} with Dr. {dname}")
+else:
+    st.success("No upcoming appointments in the next 24 hours.")
+
+conn.close()
+
 if selected == "Dashboard":
     st.subheader("📊 Overview")
     conn = create_connection()
