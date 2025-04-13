@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 import os
 from streamlit_extras.switch_page_button import switch_page
 import base64
-from streamlit_calendar import calendar as fullcalendar
+import streamlit_calendar as st_cal
 
 
 def create_connection():
@@ -115,51 +115,57 @@ conn = create_connection()
 cursor = conn.cursor()
 
 if selected == "Calendar":
-    st.subheader("📅 Appointment Calendar")
+    st.subheader("📅 Appointments Calendar")
+
     conn = create_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT a.id, a.appointment_time, a.notes, p.id, p.name, d.id, d.name
+        SELECT a.id, a.appointment_time, a.notes,
+            p.id AS patient_id, p.name AS patient_name,
+            d.id AS doctor_id, d.name AS doctor_name
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
     """)
-    results = cursor.fetchall()
+    appointments = cursor.fetchall()
 
+    # Build calendar events
     events = []
-    appointment_info = {}
-
-    for aid, appt_time, notes, pid, pname, did, dname in results:
-        title = f"{pname} with Dr. {dname}"
-        events.append({
+    event_lookup = {}  # Store appointment details by ID
+    for aid, appt_time, notes, pid, pname, did, dname in appointments:
+        event = {
             "id": str(aid),
-            "title": title,
+            "title": f"{pname} with Dr. {dname}",
             "start": appt_time.isoformat(),
             "end": (appt_time + timedelta(minutes=30)).isoformat()
-        })
-        appointment_info[str(aid)] = {
+        }
+        events.append(event)
+        event_lookup[str(aid)] = {
             "Patient ID": pid,
             "Patient Name": pname,
             "Doctor ID": did,
             "Doctor Name": dname,
-            "Appointment Notes": notes
+            "Appointment Time": appt_time.strftime("%Y-%m-%d %H:%M"),
+            "Notes": notes or "No notes"
         }
 
-    clicked_event = fullcalendar(
+    # Calendar rendering
+    clicked = st_cal.calendar(
         events=events,
         options={
             "initialView": "timeGridWeek",
             "height": 600,
-            "editable": False
-        },
-        key="admin_calendar"
+            "editable": False,
+        }
     )
 
-    if clicked_event and clicked_event.get("id") in appointment_info:
-        st.subheader("📋 Appointment Details")
-        info = appointment_info[clicked_event["id"]]
-        for key, value in info.items():
-            st.write(f"**{key}:** {value}")
+    # Display info if event clicked
+    if clicked and "event" in clicked:
+        appt_id = clicked["event"].get("id")
+        if appt_id and appt_id in event_lookup:
+            st.success("📌 Appointment Details")
+            for key, value in event_lookup[appt_id].items():
+                st.markdown(f"**{key}:** {value}")
 
 elif selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
