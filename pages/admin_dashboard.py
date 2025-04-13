@@ -116,23 +116,32 @@ cursor = conn.cursor()
 
 if selected == "Calendar":
     st.subheader("📅 Appointment Calendar")
+
     cursor.execute("""
-        SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name, a.notes
+        SELECT a.appointment_time, a.notes, 
+               p.id AS patient_id, p.name AS patient_name,
+               d.id AS doctor_id, d.name AS doctor_name
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
+        WHERE a.doctor_id = %s
         ORDER BY a.appointment_time DESC
-    """)
+    """, (user_id,))
     appointments = cursor.fetchall()
 
     events = []
-    for appt_time, pname, dname, notes in appointments:
+    for appt_time, notes, pid, pname, did, dname in appointments:
+        tooltip = f"""
+        🧑 Patient: {pname} ({pid})  
+        🩺 Doctor: {dname} ({did})  
+        📝 Notes: {notes or 'No notes'}
+        """
         events.append({
-            "title": f"{pname} with Dr. {dname}",
+            "title": f"{pname} Appointment",
             "start": appt_time.isoformat(),
             "end": (appt_time + timedelta(minutes=30)).isoformat(),
             "extendedProps": {
-                "notes": notes
+                "tooltip": tooltip.strip()
             }
         })
 
@@ -142,20 +151,19 @@ if selected == "Calendar":
             "initialView": "timeGridWeek",
             "height": 600,
             "editable": False,
-            "eventDidMount": """
-                function(info) {
-                    if (info.event.extendedProps.notes) {
-                        tippy(info.el, {
-                            content: info.event.extendedProps.notes,
-                            placement: 'top',
-                            theme: 'light-border'
-                        });
-                    }
+            "eventDidMount": """(info) => {
+                const tooltip = info.event.extendedProps.tooltip;
+                if (tooltip) {
+                    tippy(info.el, {
+                        content: tooltip,
+                        allowHTML: true,
+                        theme: 'light-border',
+                    });
                 }
-            """
-        },
-        key="admin_calendar"
+            }"""
+        }
     )
+
 
 if selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
