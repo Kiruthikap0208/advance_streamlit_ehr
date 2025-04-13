@@ -47,7 +47,6 @@ st.markdown("""
     section[data-testid="stSidebar"] * { color: #ffffff !important; }
     #MainMenu, footer { visibility: hidden; }
     </style>
-
 """, unsafe_allow_html=True)
 
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
@@ -128,7 +127,6 @@ if selected == "Dashboard":
 
     for app in upcoming:
         st.write(f"🗓️ {app[3]} | Patient: {app[1]} | Doctor: {app[2]} | Notes: {app[4]}")
-
 if selected == "Departments":
     st.subheader("🏢 Hospital Departments")
     with st.expander("➕ Add Department"):
