@@ -41,44 +41,47 @@ st.markdown("""
     /* Hide default sidebar nav */
     div[data-testid="stSidebarNav"] > ul { display: none; }
 
-    /* Custom sidebar */
+    /* Sidebar styles */
     section[data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.3) !important;
         backdrop-filter: blur(10px);
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
-
-    /* Sidebar text color */
     section[data-testid="stSidebar"] * {
         color: #ffffff !important;
     }
 
-    /* Main content text color */
-    div[class^="block-container"] * {
+    /* General text color */
+    div[class^="block-container"] {
         color: #f1f1f1 !important;
     }
 
-    /* Make input boxes transparent */
-    input, textarea, select {
+    /* Transparent and styled input boxes */
+    input, textarea, select, .stTextInput input, .stDateInput input, .stSelectbox div[data-baseweb="select"] {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 8px !important;
+    }
+
+    /* Transparent dropdown menus */
+    div[data-baseweb="select"] > div {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #ffffff !important;
+    }
+
+    /* Button styles */
+    button, .stButton button {
         background-color: rgba(255, 255, 255, 0.1) !important;
         color: #ffffff !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        border-radius: 5px !important;
+        border-radius: 6px !important;
     }
 
-    /* Button style */
-    button[kind="primary"] {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        border-radius: 5px !important;
-    }
-
-    /* Hide Streamlit main menu & footer */
+    /* Hide Streamlit menu and footer */
     #MainMenu, footer { visibility: hidden; }
     </style>
 """, unsafe_allow_html=True)
-
 
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
