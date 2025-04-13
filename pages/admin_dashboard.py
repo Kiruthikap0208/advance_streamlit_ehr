@@ -137,17 +137,16 @@ if selected == "Calendar":
             "title": event_title,
             "start": event_start,
             "end": event_end,
+            "extendedProps": {
+                "patient_id": pid,
+                "patient_name": pname,
+                "doctor_id": did,
+                "doctor_name": dname,
+                "notes": notes or 'No additional notes'
+            }
         })
 
-        event_info_map[event_title] = {
-            "patient_id": pid,
-            "patient_name": pname,
-            "doctor_id": did,
-            "doctor_name": dname,
-            "notes": notes or 'No additional notes'
-        }
-
-    clicked_event = st_cal.calendar(
+    clicked_event = fullcalendar(
         events=events,
         options={
             "initialView": "timeGridWeek",
@@ -157,19 +156,17 @@ if selected == "Calendar":
         key="admin_calendar"
     )
 
-    if clicked_event:
-        title = clicked_event.get("title")
-        if title and title in event_info_map:
-            ep = event_info_map[title]
-            st.info(f"""
-            **📌 Appointment Details:**
+    if clicked_event and "extendedProps" in clicked_event:
+        ep = clicked_event["extendedProps"]
+        st.info(f"""
+        **📌 Appointment Details:**
 
-            - 👤 **Patient ID:** {ep['patient_id']}
-            - 🧑‍⚕️ **Doctor ID:** {ep['doctor_id']}
-            - 👤 **Patient Name:** {ep['patient_name']}
-            - 🧑‍⚕️ **Doctor Name:** {ep['doctor_name']}
-            - 📝 **Notes:** {ep['notes']}
-            """)
+        - 👤 **Patient ID:** {ep['patient_id']}
+        - 🧑‍⚕️ **Doctor ID:** {ep['doctor_id']}
+        - 👤 **Patient Name:** {ep['patient_name']}
+        - 🧑‍⚕️ **Doctor Name:** {ep['doctor_name']}
+        - 📝 **Notes:** {ep['notes']}
+        """)
 
 if selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
