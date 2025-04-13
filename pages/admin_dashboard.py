@@ -38,45 +38,31 @@ st.set_page_config(page_title="Admin Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    /* Set all text color to white */
-    html, body, [class*="css"] {
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(to bottom, #003973, #E5E5BE);
+        color: white !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    section[data-testid="stSidebar"] * {
         color: white !important;
     }
-
-    /* Make widget containers 75% transparent */
-    .stSelectbox > div, .stDateInput > div, .stTimeInput > div,
-    .stTextInput > div, .stTextArea > div, .stButton > button {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white !important;
-        border-radius: 8px;
+    div[data-testid="stSidebarNav"] > ul {
+        display: none;
     }
-
-    /* Inputs inside widgets */
-    .stTextInput input, .stTextArea textarea {
-        background-color: transparent !important;
+    .stApp {
         color: white !important;
     }
-
-    /* Dropdown and calendar popups */
-    .css-1wa3eu0, .css-1n76uvr, .css-1dimb5e {
-        background-color: rgba(0, 0, 0, 0.6) !important;
+    input, textarea, select {
+        background-color: rgba(255, 255, 255, 0.15) !important;
         color: white !important;
+        border: 1px solid white !important;
     }
-
-    /* Labels and other inline elements */
-    label, .st-bb, .st-c6, .css-145kmo2, .css-10trblm {
+    button[kind="primary"], button[kind="secondary"] {
+        background-color: rgba(255, 255, 255, 0.15) !important;
         color: white !important;
+        border: 1px solid white !important;
     }
-
-    /* Button hover and interaction style */
-    .stButton > button:hover {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        color: white !important;
-    }
-
-    /* Hide Streamlit default menu and footer */
-    #MainMenu, header, footer {
+    #MainMenu, footer {
         visibility: hidden;
     }
     </style>
