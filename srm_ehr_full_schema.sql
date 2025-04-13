@@ -1,82 +1,101 @@
-
--- Create database
 CREATE DATABASE IF NOT EXISTS srm_ehr;
 USE srm_ehr;
-
--- Main users table
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+-- USERS TABLE
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR(20) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('doctor', 'admin', 'patient') NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(100), -- Set to NULL initially
+    dob DATE,
+    role ENUM('admin', 'doctor', 'patient') NOT NULL
 );
 
--- Approved doctors
+-- APPROVED ADMINS
+CREATE TABLE IF NOT EXISTS approved_admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    dob DATE,
+    email VARCHAR(100)
+);
+
+-- APPROVED DOCTORS
 DROP TABLE IF EXISTS approved_doctors;
 CREATE TABLE approved_doctors (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    dob DATE NOT NULL,
+    name VARCHAR(100),
+    dob DATE,
+    email VARCHAR(100),
     department VARCHAR(100),
-    email VARCHAR(100)
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES departments(id)	
 );
 
--- Approved admins
-DROP TABLE IF EXISTS approved_admins;
-CREATE TABLE approved_admins (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    dob DATE NOT NULL,
-    email VARCHAR(100)
-);
-
--- Approved patients
-DROP TABLE IF EXISTS approved_patients;
-CREATE TABLE approved_patients (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    dob DATE NOT NULL,
-    email VARCHAR(100)
-);
-
--- Patient info (for doctors/admin)
-DROP TABLE IF EXISTS patients;
-CREATE TABLE patients (
+-- APPROVED PATIENTS
+CREATE TABLE IF NOT EXISTS approved_patients (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
+    dob DATE,
+    email VARCHAR(100)
+);
+
+-- PATIENTS TABLE (Linked to users)
+CREATE TABLE IF NOT EXISTS patients (
+    id VARCHAR(20) PRIMARY KEY,
+    name VARCHAR(100),
+    dob DATE,
     age INT,
     gender VARCHAR(10),
     symptoms TEXT,
     diagnosis TEXT,
-    created_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (created_by) REFERENCES users(id)
+    created_by VARCHAR(20),
+    FOREIGN KEY (id) REFERENCES users(id)
 );
 
--- Appointments
-DROP TABLE IF EXISTS appointments;
-CREATE TABLE appointments (
+-- DOCTOR DEPARTMENTS
+CREATE TABLE IF NOT EXISTS departments (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id INT,
-    doctor_id INT,
+    dept_name VARCHAR(100) NOT NULL UNIQUE,
+    building VARCHAR(50),
+    rooms VARCHAR(50)
+);
+
+-- APPOINTMENTS TABLE
+CREATE TABLE IF NOT EXISTS appointments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id VARCHAR(20),
+    doctor_id VARCHAR(20),
     appointment_time DATETIME,
     notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (patient_id) REFERENCES patients(id),
+    FOREIGN KEY (patient_id) REFERENCES users(id),
     FOREIGN KEY (doctor_id) REFERENCES users(id)
 );
 
--- Reports
-DROP TABLE IF EXISTS reports;
-CREATE TABLE reports (
+-- PRESCRIPTIONS
+CREATE TABLE IF NOT EXISTS prescriptions (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id INT,
-    file_path VARCHAR(255),
-    uploaded_by INT,
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (patient_id) REFERENCES patients(id),
-    FOREIGN KEY (uploaded_by) REFERENCES users(id)
+    patient_id VARCHAR(20),
+    doctor_id VARCHAR(20),
+    medicine TEXT,
+    dosage TEXT,
+    instructions TEXT,
+    date_issued DATE DEFAULT (CURRENT_DATE),
+    FOREIGN KEY (patient_id) REFERENCES users(id),
+    FOREIGN KEY (doctor_id) REFERENCES users(id)
 );
+
+-- REPORTS
+CREATE TABLE IF NOT EXISTS reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id VARCHAR(20),
+    file_path VARCHAR(255),
+    uploaded_by VARCHAR(20),
+    uploaded_at DATETIME,
+    FOREIGN KEY (patient_id) REFERENCES users(id)
+);
+
+ALTER TABLE appointments
+ADD COLUMN dept_name VARCHAR(100),
+ADD COLUMN building VARCHAR(50),
+ADD COLUMN room_no VARCHAR(50);
+
+
