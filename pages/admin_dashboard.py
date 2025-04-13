@@ -147,8 +147,6 @@ if selected == "Calendar":
             "Appointment Time": appt_time.strftime("%Y-%m-%d %H:%M"),
             "Notes": notes or "No notes"
         }
-
-
     # Calendar rendering
     clicked = st_cal.calendar(
         events=events,
