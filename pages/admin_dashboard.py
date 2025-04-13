@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 import os
 from streamlit_extras.switch_page_button import switch_page
 import base64
-from streamlit_calendar import calendar as fullcalendar
+import streamlit_calendar as st_cal
 
 
 def create_connection():
