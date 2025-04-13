@@ -126,50 +126,43 @@ if selected == "Calendar":
     appointments = cursor.fetchall()
 
     events = []
-    event_details_map = {}
 
-    for index, (appt_time, pname, dname, notes, pid, did) in enumerate(appointments):
-        event_id = f"event_{index}"
-        event_title = f"{pname} with Dr. {dname}"
-        event_start = appt_time.isoformat()
-        event_end = (appt_time + timedelta(minutes=30)).isoformat()
-
+    for appt_time, pname, dname, notes, pid, did in appointments:
         events.append({
-            "id": event_id,
-            "title": event_title,
-            "start": event_start,
-            "end": event_end,
+            "title": f"{pname} with Dr. {dname}",
+            "start": appt_time.isoformat(),
+            "end": (appt_time + timedelta(minutes=30)).isoformat(),
+            "extendedProps": {
+                "patient_id": pid,
+                "patient_name": pname,
+                "doctor_id": did,
+                "doctor_name": dname,
+                "notes": notes or "No notes available"
+            }
         })
 
-        event_details_map[event_id] = {
-            "patient_id": pid,
-            "patient_name": pname,
-            "doctor_id": did,
-            "doctor_name": dname,
-            "notes": notes or 'No additional notes'
-        }
-
-    clicked_event = fullcalendar(
+    clicked = fullcalendar(
         events=events,
         options={
             "initialView": "timeGridWeek",
             "height": 600,
-            "editable": False
+            "editable": False,
+            "eventClick": True
         },
-        key="admin_calendar"
+        key="calendar_admin"
     )
 
-    if clicked_event and clicked_event.get("id") in event_details_map:
-        ep = event_details_map[clicked_event["id"]]
-        st.info(f"""
-        **📌 Appointment Details:**
-
-        - 👤 **Patient ID:** {ep['patient_id']}
-        - 🧑‍⚕️ **Doctor ID:** {ep['doctor_id']}
-        - 👤 **Patient Name:** {ep['patient_name']}
-        - 🧑‍⚕️ **Doctor Name:** {ep['doctor_name']}
-        - 📝 **Notes:** {ep['notes']}
+    if clicked and "extendedProps" in clicked:
+        ep = clicked["extendedProps"]
+        st.markdown(f"""
+        ### 🗂️ Appointment Info
+        - **👤 Patient ID:** {ep['patient_id']}
+        - **👤 Patient Name:** {ep['patient_name']}
+        - **🧑‍⚕️ Doctor ID:** {ep['doctor_id']}
+        - **🧑‍⚕️ Doctor Name:** {ep['doctor_name']}
+        - **📝 Notes:** {ep['notes']}
         """)
+
 
 if selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
