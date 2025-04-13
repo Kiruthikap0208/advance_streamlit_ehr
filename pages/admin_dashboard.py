@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 import os
 from streamlit_extras.switch_page_button import switch_page
 import base64
-import streamlit_calendar as st_cal
+from streamlit_calendar import calendar as fullcalendar
 
 
 def create_connection():
@@ -129,25 +129,25 @@ if selected == "Calendar":
     """)
     appointments = cursor.fetchall()
 
-    # Build calendar events
+    # Build calendar events with detailed info
     events = []
-    event_lookup = {}  # Store appointment details by ID
+    event_lookup = {}
     for aid, appt_time, notes, pid, pname, did, dname in appointments:
+        title = f"PID: {pid} | DID: {did}\nTime: {appt_time.strftime('%H:%M')} | Notes: {notes or 'N/A'}"
         event = {
             "id": str(aid),
-            "title": f"{pname} with Dr. {dname}",
+            "title": title,
             "start": appt_time.isoformat(),
             "end": (appt_time + timedelta(minutes=30)).isoformat()
         }
         events.append(event)
         event_lookup[str(aid)] = {
             "Patient ID": pid,
-            "Patient Name": pname,
             "Doctor ID": did,
-            "Doctor Name": dname,
             "Appointment Time": appt_time.strftime("%Y-%m-%d %H:%M"),
             "Notes": notes or "No notes"
         }
+
 
     # Calendar rendering
     clicked = st_cal.calendar(
