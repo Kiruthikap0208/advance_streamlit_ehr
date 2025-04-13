@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 import os
 from streamlit_extras.switch_page_button import switch_page
 import base64
-from streamlit_calendar import calendar as fullcalendar
+import streamlit_calendar as st_cal
 
 
 def create_connection():
@@ -82,22 +82,8 @@ st.markdown(f"""
 with st.sidebar:
     selected = option_menu(
         menu_title=None,
-        options=[
-            "Dashboard",
-            "Patients",
-            "Doctors",
-            "Appointments",
-            "Reports",
-            "Calendar"
-        ],
-        icons=[
-            "speedometer",
-            "people",
-            "person-badge",
-            "calendar",
-            "file-earmark-medical",
-            "calendar3"
-        ],
+        options=["Dashboard", "Patients", "Doctors", "Departments", "Appointments", "Reports", "Calendar"],
+        icons=["speedometer", "people", "person-badge", "building", "calendar", "file-earmark-medical", "calendar3"],
         menu_icon="hospital",
         default_index=0
     )
@@ -115,51 +101,58 @@ conn = create_connection()
 cursor = conn.cursor()
 
 if selected == "Calendar":
-    st.subheader("📅 Appointment Calendar")
+    st.subheader("📅 Appointments Calendar")
+
     conn = create_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT a.id, a.appointment_time, a.notes, p.id, p.name, d.id, d.name
+        SELECT a.id, a.appointment_time, a.notes,
+            p.id AS patient_id, p.name AS patient_name,
+            d.id AS doctor_id, d.name AS doctor_name
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
     """)
-    results = cursor.fetchall()
+    appointments = cursor.fetchall()
 
     events = []
-    appointment_info = {}
-
-    for aid, appt_time, notes, pid, pname, did, dname in results:
-        title = f"{pname} with Dr. {dname}"
-        events.append({
+    event_lookup = {}
+    for aid, appt_time, notes, pid, pname, did, dname in appointments:
+        short_note = (notes[:40] + '...') if notes and len(notes) > 40 else (notes or 'N/A')
+        title = f"PID: {pid} | DID: {did} | 🕒 {appt_time.strftime('%H:%M')}\n📝 {short_note}"
+        event = {
             "id": str(aid),
             "title": title,
             "start": appt_time.isoformat(),
             "end": (appt_time + timedelta(minutes=30)).isoformat()
-        })
-        appointment_info[str(aid)] = {
+        }
+        events.append(event)
+        event_lookup[str(aid)] = {
             "Patient ID": pid,
-            "Patient Name": pname,
             "Doctor ID": did,
-            "Doctor Name": dname,
-            "Appointment Notes": notes
+            "Appointment Time": appt_time.strftime("%Y-%m-%d %H:%M"),
+            "Notes": notes or "No notes"
         }
 
-    clicked_event = fullcalendar(
+    clicked = st_cal.calendar(
         events=events,
         options={
-            "initialView": "timeGridWeek",
-            "height": 600,
-            "editable": False
+            "initialView": "timeGridDay",
+            "editable": False,
+            "eventDisplay": "block",
+            "eventMaxLines": 4,
+            "height": 850 
         },
-        key="admin_calendar"
+          # Ensure this is outside options
     )
 
-    if clicked_event and clicked_event.get("id") in appointment_info:
-        st.subheader("📋 Appointment Details")
-        info = appointment_info[clicked_event["id"]]
-        for key, value in info.items():
-            st.write(f"**{key}:** {value}")
+    if clicked and "event" in clicked:
+        appt_id = clicked["event"].get("id")
+        if appt_id and appt_id in event_lookup:
+            st.success("📌 Appointment Details")
+            for key, value in event_lookup[appt_id].items():
+                st.markdown(f"**{key}:** {value}")
+
 
 elif selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
@@ -288,19 +281,28 @@ elif selected == "Doctors":
 
 elif selected == "Appointments":
     st.subheader("📅 Book New Appointment")
-    conn = create_connection()
-    cursor = conn.cursor()
-
     cursor.execute("SELECT id, name FROM users WHERE role='patient'")
     patients = cursor.fetchall()
     patient_options = {f"{name} ({pid})": pid for pid, name in patients}
 
-    cursor.execute("SELECT id, name FROM users WHERE role='doctor'")
-    doctors = cursor.fetchall()
-    doctor_options = {f"{name} ({did})": did for did, name in doctors}
+    cursor.execute("SELECT dept_name FROM departments")
+    department_list = [d[0] for d in cursor.fetchall()]
+
+    cursor.execute("SELECT id, name, email FROM users WHERE role='doctor'")
+    doctor_map = cursor.fetchall()
 
     with st.form("appointment_form"):
         selected_patient = st.selectbox("Select Patient", list(patient_options.keys()))
+        selected_department = st.selectbox("Select Department", department_list)
+
+        cursor.execute("SELECT email FROM approved_doctors WHERE department = %s", (selected_department,))
+        approved_emails = [row[0] for row in cursor.fetchall()]
+
+        filtered_doctors = [
+            (doc_id, doc_name) for doc_id, doc_name, doc_email in doctor_map if doc_email in approved_emails
+        ]
+        doctor_options = {f"{name} ({did})": did for did, name in filtered_doctors}
+
         selected_doctor = st.selectbox("Select Doctor", list(doctor_options.keys()))
         appointment_date = st.date_input("Appointment Date")
         appointment_time = st.time_input("Appointment Time")
@@ -309,10 +311,7 @@ elif selected == "Appointments":
 
         if submit_appt:
             datetime_combined = f"{appointment_date} {appointment_time}"
-            cursor.execute(
-                "INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes) VALUES (%s, %s, %s, %s)",
-                (patient_options[selected_patient], doctor_options[selected_doctor], datetime_combined, notes)
-            )
+            cursor.execute("INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes) VALUES (%s, %s, %s, %s)", (patient_options[selected_patient], doctor_options[selected_doctor], datetime_combined, notes))
             conn.commit()
             st.success("✅ Appointment booked successfully!")
 
@@ -336,8 +335,7 @@ elif selected == "Appointments":
             with col1:
                 if st.button("Update", key=f"update_appt_{aid}"):
                     updated_datetime = f"{new_date} {new_time}"
-                    cursor.execute("UPDATE appointments SET appointment_time = %s, notes = %s WHERE id = %s",
-                                   (updated_datetime, new_notes, aid))
+                    cursor.execute("UPDATE appointments SET appointment_time = %s, notes = %s WHERE id = %s", (updated_datetime, new_notes, aid))
                     conn.commit()
                     st.success("Appointment updated!")
             with col2:
@@ -345,7 +343,6 @@ elif selected == "Appointments":
                     cursor.execute("DELETE FROM appointments WHERE id = %s", (aid,))
                     conn.commit()
                     st.warning("Appointment cancelled.")
-    conn.close()
 
 elif selected == "Reports":
     st.subheader("📄 Upload/View Reports")
