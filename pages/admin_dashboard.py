@@ -2,12 +2,10 @@ import streamlit as st
 import mysql.connector
 from streamlit_option_menu import option_menu
 from datetime import date
-from datetime import datetime, timedelta
 import os
 from streamlit_extras.switch_page_button import switch_page
 import base64
 import streamlit_calendar as st_cal
-
 
 
 def create_connection():
@@ -83,20 +81,30 @@ st.markdown(f"""
 # Sidebar with transparent background
 with st.sidebar:
     selected = option_menu(
-        menu_title="Admin Panel",
-        options=["Dashboard", "Patients", "Doctors", "Appointments", "Reports", "Calendar"],
-        icons=["speedometer", "people", "person-badge", "calendar", "file-earmark-medical", "calendar-event"],
-        default_index=0,
-        styles={
-            "container": {"padding": "5px", "background-color": "rgba(0,0,0,0.2)"},
-            "icon": {"color": "white", "font-size": "18px"},
-            "nav-link": {"color": "white", "font-size": "16px", "text-align": "left", "margin": "5px"},
-            "nav-link-selected": {"background-color": "#007BFF"},
-        },
+        menu_title=None,
+        options=[
+            "Dashboard",
+            "Patients",
+            "Doctors",
+            "Appointments",
+            "Reports",
+            "Calendar"
+        ],
+        icons=[
+            "speedometer",
+            "people",
+            "person-badge",
+            "calendar",
+            "file-earmark-medical",
+            "calendar3"
+        ],
+        menu_icon="hospital",
+        default_index=0
     )
     st.markdown("---")
-    if st.button("Back to Main Page"):
+    if st.button("🔙 Back to Main Page"):
         switch_page("main")
+
 
 
 st.title("🏥 Admin Dashboard")
@@ -125,14 +133,15 @@ else:
 conn.close()
 
 if selected == "Calendar":
-    st.subheader("📅 All Appointments Calendar")
+    st.subheader("🗕️ Appointment Calendar")
     cursor.execute("""
-        SELECT a.appointment_time, u1.name AS patient_name, u2.name AS doctor_name
+        SELECT a.appointment_time, p.name AS patient_name, d.name AS doctor_name
         FROM appointments a
-        JOIN users u1 ON a.patient_id = u1.id
-        JOIN users u2 ON a.doctor_id = u2.id
+        JOIN users p ON a.patient_id = p.id
+        JOIN users d ON a.doctor_id = d.id
+        ORDER BY a.appointment_time DESC
     """)
-    events = cursor.fetchall()
+    appointments = cursor.fetchall()
 
     st_cal.calendar(
         events=[
@@ -140,7 +149,7 @@ if selected == "Calendar":
                 "title": f"{pname} with Dr. {dname}",
                 "start": appt_time.isoformat(),
                 "end": (appt_time + timedelta(minutes=30)).isoformat()
-            } for appt_time, pname, dname in events
+            } for appt_time, pname, dname in appointments
         ],
         options={
             "initialView": "timeGridWeek",
