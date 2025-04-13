@@ -123,16 +123,20 @@ if selected == "Calendar":
     """, (user_id,))
     appointments = cursor.fetchall()
 
-    st_cal.calendar(events=[
-        {
-            "title": f"{pname} Appointment",
-            "start": appt_time.isoformat(),
-            "end": (appt_time + timedelta(minutes=30)).isoformat()
-        } for appt_time, pname in appointments
-    ],
-    defaultView='timeGridWeek',
-    editable=False,
-    height=600)
+    st_cal.calendar(
+        events=[
+            {
+                "title": f"{pname} Appointment",
+                "start": appt_time.isoformat(),
+                "end": (appt_time + timedelta(minutes=30)).isoformat()
+            } for appt_time, pname in appointments
+        ],
+        options={
+            "initialView": "timeGridWeek",
+            "height": 600,
+            "editable": False
+        }
+    )
 
 if selected == "Today's Appointments":
     st.subheader("📅 Today's Appointments")
