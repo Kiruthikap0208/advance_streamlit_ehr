@@ -9,7 +9,8 @@ def create_connection():
         host=st.secrets["mysql"]["host"],
         user=st.secrets["mysql"]["user"],
         password=st.secrets["mysql"]["password"],
-        database=st.secrets["mysql"]["database"]
+        database=st.secrets["mysql"]["database"],
+        auth_plugin='mysql_native_password'
     )
 
 def user_exists(email):
