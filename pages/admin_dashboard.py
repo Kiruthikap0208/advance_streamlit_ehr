@@ -151,16 +151,20 @@ if selected == "Calendar":
     )
 
     if clicked_event:
-        ep = clicked_event['extendedProps']
-        st.info(f"""
-        **📌 Appointment Details:**
+        ep = clicked_event.get("extendedProps")
+        if ep:
+            st.info(f"""
+            **📌 Appointment Details:**
 
-        - 👤 **Patient ID:** {ep['patient_id']}
-        - 🧑‍⚕️ **Doctor ID:** {ep['doctor_id']}
-        - 👤 **Patient Name:** {ep['patient_name']}
-        - 🧑‍⚕️ **Doctor Name:** {ep['doctor_name']}
-        - 📝 **Notes:** {ep['notes']}
-        """)
+            - 👤 **Patient ID:** {ep.get('patient_id')}
+            - 🧑‍⚕️ **Doctor ID:** {ep.get('doctor_id')}
+            - 👤 **Patient Name:** {ep.get('patient_name')}
+            - 🧑‍⚕️ **Doctor Name:** {ep.get('doctor_name')}
+            - 📝 **Notes:** {ep.get('notes')}
+            """)
+        else:
+            st.warning("No extra details available for this event.")
+
 
 if selected == "Dashboard":
     st.subheader("🔔 Upcoming Appointments in Next 24 Hours")
