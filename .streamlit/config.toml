@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [theme]
 base = "dark"
 primaryColor = "#4A90E2"
@@ -5,3 +6,12 @@ backgroundColor = "#000000"
 secondaryBackgroundColor = "#121212"
 textColor = "#FFFFFF"
 font = "sans serif"
+=======
+[theme]
+base = "dark"
+primaryColor = "#4A90E2"
+backgroundColor = "#000000"
+secondaryBackgroundColor = "#1C1C1C"
+textColor = "#ffffff"
+font = "sans serif"
+>>>>>>> 64e1e1b (Add theme configuration to Streamlit application)
