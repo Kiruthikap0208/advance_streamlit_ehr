@@ -18,4 +18,3 @@ rich==13.3.5
 # Email (optional, used in your secrets)
 secure-smtplib
 
-chatbot_component
