@@ -7,6 +7,7 @@ import os
 import base64
 import calendar
 import streamlit_calendar as st_cal
+import streamlit.components.v1 as components
 
 
 def create_connection():
@@ -238,5 +239,122 @@ elif selected == "Profile & Settings":
             st.success("Profile updated successfully!")
     else:
         st.error("Profile not found.")
+
+
+# --- Inject chatbot toggle and popup ---
+components.html("""
+<style>
+.chat-popup-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background-color: #4A90E2;
+  color: white;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 2px 2px 12px rgba(0,0,0,0.3);
+}
+
+.chat-popup-box {
+  display: none;
+  position: fixed;
+  bottom: 90px;
+  right: 25px;
+  width: 320px;
+  height: 400px;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  border-radius: 10px;
+  padding: 10px;
+  z-index: 9999;
+  overflow-y: auto;
+}
+
+.chat-popup-box.open {
+  display: block;
+}
+
+.chat-popup-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.chat-popup-input {
+  width: 100%;
+  padding: 6px;
+  border-radius: 5px;
+  margin-top: 10px;
+  border: none;
+}
+
+.chat-msg {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.user-msg {
+  color: #00ccff;
+}
+
+.bot-msg {
+  color: #ffffff;
+}
+</style>
+
+<button class="chat-popup-btn" onclick="document.querySelector('.chat-popup-box').classList.toggle('open')">
+  💬 Ask Assistant
+</button>
+
+<div class="chat-popup-box">
+  <div class="chat-popup-header">🤖 Hospital Assistant</div>
+  <div id="chat-box"></div>
+  <input type="text" id="user-input" class="chat-popup-input" placeholder="Type here..." onkeydown="if(event.key === 'Enter') sendMessage()" />
+</div>
+
+<script>
+let chatHistory = [];
+
+function sendMessage() {
+  let input = document.getElementById("user-input");
+  let msg = input.value.trim();
+  if (msg === "") return;
+  chatHistory.push(["user", msg]);
+  renderChat();
+  input.value = "";
+
+  setTimeout(() => {
+    let reply = getBotReply(msg);
+    chatHistory.push(["bot", reply]);
+    renderChat();
+  }, 500);
+}
+
+function renderChat() {
+  let chatBox = document.getElementById("chat-box");
+  chatBox.innerHTML = "";
+  chatHistory.slice(-10).forEach(([sender, msg]) => {
+    let cls = sender === "user" ? "user-msg" : "bot-msg";
+    chatBox.innerHTML += `<div class="chat-msg ${cls}"><strong>${sender === 'user' ? 'You' : 'Bot'}:</strong> ${msg}</div>`;
+  });
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function getBotReply(q) {
+  q = q.toLowerCase();
+  if (q.includes("book")) return "🗓 Go to 'Book Appointment' to schedule a visit.";
+  if (q.includes("appointment")) return "📅 Check 'Appointments' tab for your scheduled visits.";
+  if (q.includes("report")) return "📂 Visit 'Reports' section to download or view reports.";
+  if (q.includes("department")) return "🏥 We offer departments like Cardiology, Neurology, and more.";
+  if (q.includes("contact")) return "📞 Call +91-XXXXXXXXXX or visit our helpdesk.";
+  return "🤖 I'm here to help! Try asking about appointments, reports, or contact.";
+}
+</script>
+""", height=0)
 
 conn.close()
