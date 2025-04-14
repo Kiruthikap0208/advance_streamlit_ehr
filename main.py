@@ -31,25 +31,28 @@ with open("images/health-02.jpg", "rb") as img_file:
 
 st.markdown("""
     <style>
-        /* Apply dark theme to all Streamlit buttons */
-        .stButton > button {
-            background-color: #2C3E50 !important;  /* Dark slate blue */
-            color: #122333 !important;             /* Light text */
-            font-weight: bold !important;
-            border: none !important;
-            border-radius: 10px !important;
-            padding: 0.6rem 1.2rem !important;
-            font-size: 1rem !important;
-            transition: background-color 0.3s ease;
+        /* Style for page_link() hyperlinks */
+        a[data-testid="stPageLink"] {
+            display: inline-block;
+            background-color: #2C3E50;         /* Dark slate blue */
+            color: #ECF0F1 !important;         /* Light text */
+            font-weight: bold;
+            padding: 0.7rem 1.2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            text-align: center;
+            width: 250px;
         }
 
-        /* Hover effect */
-        .stButton > button:hover {
-            background-color: #34495E !important;  /* Slightly lighter */
-            color: #00ADB5 !important;             /* Cyan accent */
+        a[data-testid="stPageLink"]:hover {
+            background-color: #34495E;         /* Hover effect */
+            color: #00ADB5 !important;         /* Cyan hover text */
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 # ----------- GLOBAL STYLING -----------
 st.markdown(f"""
