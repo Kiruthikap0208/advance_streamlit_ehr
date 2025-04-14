@@ -9,12 +9,9 @@ import base64
 import calendar
 import streamlit_calendar as st_cal
 import streamlit.components.v1 as components
-from chatbot_component import render_chatbot_popup, update_toggle_state
 from chatbot_component import chatbot_ui
 chatbot_ui()
 
-update_toggle_state()
-render_chatbot_popup()
 
 api_key = st.secrets["openai"]["api_key"]
 
@@ -249,9 +246,5 @@ elif selected == "Profile & Settings":
     else:
         st.error("Profile not found.")
 
-
-
-if "user_id" in st.session_state and st.session_state.get("role") == "patient":
-    render_chatbot_popup()
 
 conn.close()
