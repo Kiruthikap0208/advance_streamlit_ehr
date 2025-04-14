@@ -1,78 +1,102 @@
 import streamlit as st
-import openai
+from streamlit.components.v1 import html
+from openai import OpenAI
 
-openai.api_key = st.secrets["openai"]["api_key"]
-
-def handle_faq(prompt):
-    prompt = prompt.lower()
-    if "book" in prompt and "appointment" in prompt:
-        return "To book an appointment, go to the 'Book Appointment' tab in the sidebar."
-    elif "my appointments" in prompt:
-        return "To view your appointments, click on the 'Appointments' tab."
-    elif "report" in prompt:
-        return "You can upload or view reports under the 'Reports' tab."
-    elif "department" in prompt:
-        return "We offer departments like Cardiology, Neurology, Pediatrics, etc."
-    elif "support" in prompt:
-        return "Please contact our support team at support@ehrhospital.com."
-    return None
+# Initialize client
+client = OpenAI(api_key=st.secrets["openai"]["api_key"])
 
 def ask_openai(prompt):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
             max_tokens=150
         )
-        return response.choices[0].message["content"].strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         return f"Sorry, something went wrong: {e}"
 
-def render_chatbot_popup():
-    st.markdown("""
-        <style>
-            .chatbot-button {
-                position: fixed;
-                bottom: 25px;
-                right: 30px;
-                z-index: 9999;
-            }
-            .chatbot-box {
-                position: fixed;
-                bottom: 90px;
-                right: 30px;
-                width: 320px;
-                background: rgba(30,30,30,0.95);
-                padding: 15px;
-                border-radius: 15px;
-                color: white;
-                z-index: 9998;
-                box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            }
-        </style>
-    """, unsafe_allow_html=True)
 
+def chatbot_ui():
     with st.container():
-        col1, col2, col3 = st.columns([7, 1, 1])
-        with col3:
-            if st.button("💬", key="toggle_chat_button"):
-                st.session_state.show_chat = not st.session_state.get("show_chat", False)
+        # Floating chatbot button
+        html("""
+        <style>
+        .chat-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #2b90d9;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 9999;
+        }
+        .chat-popup {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: none;
+        }
+        .chat-header {
+            background: #2b90d9;
+            color: white;
+            padding: 10px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-weight: bold;
+        }
+        </style>
 
-    if st.session_state.get("show_chat", False):
-        with st.container():
-            st.markdown("<div class='chatbot-box'>", unsafe_allow_html=True)
-            st.markdown("#### 🤖 EHR Assistant")
+        <script>
+        function toggleChat() {
+            var chat = document.getElementById("chatBox");
+            if (chat.style.display === "none") {
+                chat.style.display = "block";
+            } else {
+                chat.style.display = "none";
+            }
+        }
+        </script>
 
-            user_input = st.text_input("Ask something...", key="chat_input")
-            if user_input:
-                reply = handle_faq(user_input) or ask_openai(user_input)
-                st.markdown(f"**You:** {user_input}")
-                st.markdown(f"**Bot:** {reply}")
+        <div class="chat-popup" id="chatBox">
+            <div class="chat-header">🤖 EHR Assistant</div>
+            <iframe srcdoc='<body style="margin:0;">{{CHAT}}</body>' width="100%" height="350px" style="border:none;"></iframe>
+        </div>
+        <button class="chat-button" onclick="toggleChat()">💬 Chat</button>
+        """, height=0)
 
-            st.markdown("</div>", unsafe_allow_html=True)
+        # Render actual Streamlit chatbot inside iframe
+        with st.empty():
+            with st.form("chat_form", clear_on_submit=True):
+                st.markdown("**Hi! How can I help you today?**")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    book = st.form_submit_button("📅 Book Appointment")
+                with col2:
+                    reports = st.form_submit_button("📄 View Reports")
+                with col3:
+                    help_ = st.form_submit_button("❓ Ask a Question")
 
-def update_toggle_state():
-    if "show_chat" not in st.session_state:
-        st.session_state.show_chat = False
+                user_input = st.text_input("Type your query below", key="chat_input")
+                submit = st.form_submit_button("Send")
 
+            if book:
+                st.write(ask_openai("I want to book an appointment"))
+            elif reports:
+                st.write(ask_openai("Show my medical reports"))
+            elif help_:
+                st.write(ask_openai("I have a question about my treatment"))
+            elif submit and user_input:
+                st.write(f"You: {user_input}")
+                st.write(f"Bot: {ask_openai(user_input)}")
