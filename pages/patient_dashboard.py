@@ -118,65 +118,44 @@ if selected == "My Health Records":
         st.error("Patient record not found.")
 
 elif selected == "Book Appointment":
-    st.subheader("📅 Book a New Appointment")
+    st.subheader("📆 Book a New Appointment")
 
-    # Connect DB
-    conn = create_connection()
-    cursor = conn.cursor()
-
-    # Select department first
-    cursor.execute("SELECT DISTINCT department FROM approved_doctors")
+    # Step 1: Select Department
+    cursor.execute("SELECT dept_name FROM departments")
     departments = [row[0] for row in cursor.fetchall()]
+    selected_dept = st.selectbox("Choose Department", departments)
 
-    if not departments:
-        st.warning("No departments found.")
+    # Step 2: Get doctors in that department (join via approved_doctors)
+    cursor.execute("""
+        SELECT u.id, u.name
+        FROM users u
+        JOIN approved_doctors ad ON u.email = ad.email
+        WHERE u.role = 'doctor' AND ad.department = %s
+    """, (selected_dept,))
+    doctor_list = cursor.fetchall()
+
+    if not doctor_list:
+        st.warning("No doctors found in this department.")
     else:
-        selected_dept = st.selectbox("Choose Department", departments)
+        doctor_map = {f"Dr. {name} ({doc_id})": doc_id for doc_id, name in doctor_list}
+        selected_doc_label = st.selectbox("Choose Doctor", list(doctor_map.keys()))
 
-        # Fetch doctors in this department by joining on email
-        cursor.execute("""
-            SELECT u.name, u.email
-            FROM users u
-            JOIN approved_doctors ad ON u.email = ad.email
-            WHERE ad.department = %s AND u.role = 'doctor'
-        """, (selected_dept,))
-        doctors = cursor.fetchall()
+        # Step 3: Select date and time
+        appt_date = st.date_input("Select Date", min_value=date.today())
+        appt_time = st.time_input("Select Time")
+        notes = st.text_area("Reason for Visit / Notes")
 
-        if not doctors:
-            st.warning("No doctors available in this department.")
-        else:
-            doc_names = [doc[0] for doc in doctors]
-            selected_doc = st.selectbox("Choose Doctor", doc_names)
+        # Step 4: Submit appointment
+        if st.button("📅 Book Appointment"):
+            appointment_datetime = datetime.combine(appt_date, appt_time)
+            selected_doc_id = doctor_map[selected_doc_label]
 
-            appointment_date = st.date_input("Appointment Date")
-            appointment_time = st.time_input("Appointment Time")
-
-            reason = st.text_area("Reason for Appointment")
-
-            if st.button("Book Appointment"):
-                # Get patient ID from session
-                patient_id = st.session_state.get("user_id")  # This will be like 'p_1'
-
-                # Get selected doctor's email
-                selected_doc_email = [doc[1] for doc in doctors if doc[0] == selected_doc][0]
-
-                # Get doctor ID from users using email
-                cursor.execute("SELECT id FROM users WHERE email = %s AND role = 'doctor'", (selected_doc_email,))
-                doc_result = cursor.fetchone()
-
-                if doc_result:
-                    doctor_id = doc_result[0]
-                    appointment_time = datetime.combine(appointment_date, appointment_time)
-                    notes = st.text_area("Reason for Visit")
-                    # Insert appointment
-                    cursor.execute("""
-                        INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """, (patient_id, doctor_id, appointment_date, appointment_time, notes))
-                    conn.commit()
-                    st.success("Appointment booked successfully!")
-                else:
-                    st.error("Selected doctor not found.")
+            cursor.execute("""
+                INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
+                VALUES (%s, %s, %s, %s)
+            """, (user_id, selected_doc_id, appointment_datetime, notes))
+            conn.commit()
+            st.success("✅ Appointment booked successfully!")
 
 
 elif selected == "Reports":
