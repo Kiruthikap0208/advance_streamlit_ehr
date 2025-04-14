@@ -76,6 +76,8 @@ st.markdown(f"""
 st.markdown("## 🩺 SRM Electronic Health Records")
 st.markdown("### Choose your login portal")
 
+st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
 st.page_link("pages/login_doctor.py", label="👨‍⚕️ Doctor Portal", icon="🧑‍⚕️")
 st.page_link("pages/login_admin.py", label="🧑‍💼 Admin / Receptionist Portal", icon="📋")
 st.page_link("pages/login_patient.py", label="🧑‍🦽 Patient Portal", icon="🩺")
+st.markdown("</div>", unsafe_allow_html=True)
