@@ -88,9 +88,8 @@ with st.sidebar:
         menu_icon="person",
         default_index=0
     )
-    st.markdown("---")
-    if st.button("🔙 Back to Main Page"):
-        switch_page("main")
+    st.page_link("main.py", label="🔙 Back to Main Page", icon="🏠")
+
 
 st.title("🩺 Doctor Dashboard")
 

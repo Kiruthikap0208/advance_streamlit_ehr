@@ -1,6 +1,7 @@
 import streamlit as st 
 import base64
 import mysql.connector
+from streamlit_extras.switch_page_button import switch_page
 
 # ----------- DB CONNECTION -----------
 def create_connection():

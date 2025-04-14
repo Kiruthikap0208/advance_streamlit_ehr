@@ -122,6 +122,8 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
+from datetime import date
+
 col1, col2, col3 = st.columns([1, 1, 2.2])
 with col3:
     st.title("Admin Signup")
@@ -140,14 +142,14 @@ with col3:
         elif user_exists(email):
             st.error("An account with this email already exists.")
         elif not is_approved_admin(name, dob):
-            st.error("\u274c You’re not approved by the hospital. Please contact higher authority.")
+            st.error("❌ You’re not approved by the hospital. Please contact higher authority.")
         else:
             register_admin(name, email, password)
-            st.success("\u2705 Account created successfully!")
-            if st.button("🔐 Go to Login Page"):
-                switch_page("login patient")
+            st.success("✅ Account created successfully!")
 
-    if st.button("Already have an account? Log in"):
-        switch_page("login admin")
+    # Navigation links
+    st.page_link("pages/login_admin.py", label="🔐 Go to Login Page", icon="➡️")
+    st.page_link("pages/login_admin.py", label="Already have an account? Log in", icon="👤")
 
     st.markdown("</div>", unsafe_allow_html=True)
+

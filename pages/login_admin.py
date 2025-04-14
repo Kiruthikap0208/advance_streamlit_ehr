@@ -97,7 +97,6 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# Login box content
 col1, col2, col3 = st.columns([1, 1, 2.2])
 with col3:
     st.title("👩‍💼 Admin Login")
@@ -111,14 +110,12 @@ with col3:
             st.success("Login successful!")
             st.session_state.logged_in = True
             st.session_state.user_email = email
-            switch_page("admin dashboard")
+            switch_page("admin dashboard")  # Keep this since page_link is for buttons, not programmatic flow
         else:
             st.error("Invalid credentials or not an admin.")
-            
-    if st.button("Forgot password?"):
-        switch_page("Forgot_Password")
 
-    if st.button("Don't have an account? Sign up"):
-        switch_page("signup admin")
+    # Use page_link for static navigation buttons
+    st.page_link("pages/Forgot_Password.py", label="Forgot password?", icon="🔐")
+    st.page_link("pages/signup_admin.py", label="Don't have an account? Sign up", icon="📝")
 
     st.markdown("</div>", unsafe_allow_html=True)

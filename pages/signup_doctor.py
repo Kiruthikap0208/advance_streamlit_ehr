@@ -125,6 +125,8 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
+from datetime import date
+
 col1, col2, col3 = st.columns([1, 1, 2.2])
 with col3:
     st.title("🩺 Doctor Signup")
@@ -147,10 +149,10 @@ with col3:
         else:
             register_doctor(name, email, password, dob)
             st.success("✅ Account created successfully!")
-            if st.button("🔐 Go to Login Page"):
-                switch_page("login doctor")
 
-    if st.button("Already have an account? Log in"):
-        switch_page("login doctor")
+    # Page navigation using st.page_link
+    st.page_link("pages/login_doctor.py", label="🔐 Go to Login Page", icon="➡️")
+    st.page_link("pages/login_doctor.py", label="Already have an account? Log in", icon="👤")
 
     st.markdown("</div>", unsafe_allow_html=True)
+

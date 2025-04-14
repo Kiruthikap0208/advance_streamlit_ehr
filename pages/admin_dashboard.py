@@ -92,8 +92,8 @@ with st.sidebar:
         default_index=0
     )
         
-    if st.button("🔙 Back to Main Page"):
-        switch_page("main")
+    st.page_link("main.py", label="🔙 Back to Main Page", icon="🏠")
+
 
 
 

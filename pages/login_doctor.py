@@ -1,6 +1,7 @@
 import streamlit as st
 import mysql.connector
 import base64
+from streamlit_extras.switch_page_button import switch_page
 
 
 def create_connection():
@@ -110,8 +111,7 @@ with col3:
             st.session_state.logged_in = True
             st.session_state.user_email = email
             st.session_state.user_id = user[0]
-            st.page_link("pages/doctor_dashboard.py")
-
+            switch_page("doctor dashboard")
         else:
             st.error("Invalid credentials or not a doctor.")
 

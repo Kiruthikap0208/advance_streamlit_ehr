@@ -145,11 +145,9 @@ with col3:
         else:
             register_patient(name, email, password, dob)
             st.success("✅ Account created successfully!")
-            
-            if st.button("🔐 Go to Login Page"):
-                switch_page("login patient")
 
-    if st.button("Already have an account? Log in"):
-        switch_page("login patient")
+    # Page navigation using st.page_link
+    st.page_link("pages/login_patient.py", label="🔐 Go to Login Page", icon="➡️")
+    st.page_link("pages/login_patient.py", label="Already have an account? Log in", icon="👤")
 
     st.markdown("</div>", unsafe_allow_html=True)

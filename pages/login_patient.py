@@ -110,14 +110,12 @@ with col3:
             st.session_state.logged_in = True
             st.session_state.user_email = email
             st.session_state.user_id = user[0]
-            switch_page("patient dashboard")
+            switch_page("patient dashboard")  # Keeps programmatic redirection
         else:
             st.error("Invalid credentials or not a patient.")
-            
-    if st.button("Forgot password?"):
-        switch_page("Forgot_Password")
 
-    if st.button("Don't have an account? Sign up"):
-        switch_page("signup patient")
+    # Use page_link for static page buttons
+    st.page_link("pages/Forgot_Password.py", label="Forgot password?", icon="🔐")
+    st.page_link("pages/signup_patient.py", label="Don't have an account? Sign up", icon="📝")
 
     st.markdown("</div>", unsafe_allow_html=True)
