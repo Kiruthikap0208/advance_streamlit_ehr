@@ -39,15 +39,16 @@ st.markdown(f"""
             background-attachment: fixed;
         }}
 
-        /* Make ALL buttons dark */
+        /* Make ALL buttons dark with soft blue tint */
         button[kind="primary"], .stButton > button {{
-            background-color: #222831 !important;
-            color: #ffffff !important;
+            background-color: #2C3E50 !important;  /* Dark slate blue */
+            color: #ECF0F1 !important;             /* Soft white */
             font-weight: bold !important;
             border: none !important;
             border-radius: 10px !important;
             transition: 0.3s ease;
         }}
+
 
         button[kind="primary"]:hover, .stButton > button:hover {{
             background-color: #393e46 !important;
