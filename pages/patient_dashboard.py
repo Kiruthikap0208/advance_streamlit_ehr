@@ -9,9 +9,7 @@ import base64
 import calendar
 import streamlit_calendar as st_cal
 import streamlit.components.v1 as components
-from chatbot_component import chatbot
-
-chatbot(patient_id=st.session_state.get("user_id"))
+from chatbot_component import render_chatbot
 
 def create_connection():
     return mysql.connector.connect(
@@ -244,5 +242,7 @@ elif selected == "Profile & Settings":
     else:
         st.error("Profile not found.")
 
+if "user_id" in st.session_state and st.session_state.get("role") == "patient":
+    render_chatbot()
 
 conn.close()
