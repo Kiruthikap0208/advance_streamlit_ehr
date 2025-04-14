@@ -1,6 +1,6 @@
 # Core Streamlit setup
 streamlit==1.44.0
-streamlit-extras
+streamlit-extras>=0.3.2
 streamlit-option-menu
 streamlit-calendar
 st-pages
