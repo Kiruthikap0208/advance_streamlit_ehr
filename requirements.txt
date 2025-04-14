@@ -1,8 +1,9 @@
 # Core Streamlit setup
-streamlit==1.24.0
+streamlit==1.44.0
 streamlit-extras
 streamlit-option-menu
 streamlit-calendar
+st-pages
 
 # MySQL connector
 mysql-connector-python
@@ -10,10 +11,6 @@ mysql-connector-python
 # Chatbot + OpenAI
 openai
 tiktoken
-
-# PDF/Report handling
-PyPDF2
-pillow==9.5.0    
 
 # Styling & Logs
 rich==13.3.5
