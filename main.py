@@ -30,9 +30,10 @@ with open("images/health-02.jpg", "rb") as img_file:
 # ----------- STYLING -----------
 st.markdown("""
     <style>
+        /* Apply dark theme with thick border to all page links */
         a[data-testid="stPageLink"] {
             display: inline-block;
-            background-color: #1B2631; /* Darker background */
+            background-color: #0e1117; /* Default Streamlit dark theme background */
             color: #ECF0F1 !important;
             font-weight: 700;
             padding: 0.8rem 1.5rem;
@@ -42,19 +43,18 @@ st.markdown("""
             font-size: 1.1rem;
             text-align: center;
             width: 270px;
-            border: 4px solid #000000 !important;  /* Thick & dark border */
+            border: 4px solid #000000 !important;
             box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
         }
 
         a[data-testid="stPageLink"]:hover {
-            background-color: #283747;
+            background-color: #20242c;
             color: #00E0FF !important;
             border-color: #00E0FF !important;
         }
 
-
         .stApp {
-            background-image: url("data:image/jpg;base64,""" + b64_img + """");
+            background-image: url("data:image/jpg;base64,""" + b64_img + """);
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
