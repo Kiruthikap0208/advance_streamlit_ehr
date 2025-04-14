@@ -2,7 +2,7 @@ import streamlit as st
 import mysql.connector
 import base64
 from streamlit_extras.switch_page_button import switch_page
-import os
+
 # ---------- DB CONNECTION ----------
 def create_connection():
     return mysql.connector.connect(
@@ -34,11 +34,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------- BACKGROUND IMAGE ----------
-img_path = os.path.join("images", "default_login.jpg")
-with open(img_path, "rb") as img_file:
+with open("images/copy-space-heart-shape-stethoscope.jpg", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
-
-
+    
 st.markdown(f"""
     <style>
     .stApp {{
