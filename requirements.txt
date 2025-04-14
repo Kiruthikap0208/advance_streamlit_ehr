@@ -13,7 +13,7 @@ tiktoken
 
 # PDF/Report handling
 PyPDF2
-pillow<10.0.0   # Use binary wheel only, avoids zlib issues
+pillow==9.5.0    # Use binary wheel only, avoids zlib issues
 
 # Styling & Logs
 rich==13.3.5
