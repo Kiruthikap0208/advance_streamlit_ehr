@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 
 # Load OpenAI API Key
-openai.api_key = st.secrets["openai"]["openai_api_key"]
+openai.api_key = st.secrets["openai"]["api_key"]
 
 # FAQ handler
 def handle_faq(prompt):
