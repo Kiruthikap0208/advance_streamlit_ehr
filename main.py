@@ -64,7 +64,7 @@ page_styles = f"""
     width: 30%;
     border-radius: 10px;
     background-color: #4A90E2;
-    color: black;
+    color: white;
     font-weight: bold;
     margin-top: 1rem;
     padding: 0.6rem;
@@ -75,6 +75,7 @@ page_styles = f"""
 st.markdown(page_styles, unsafe_allow_html=True)
 
 # ----------- MAIN CONTENT -----------
+
 st.markdown("## 🩺 SRM Electronic Health Records")
 st.markdown("### Choose your login portal")
 
