@@ -45,7 +45,6 @@ def render_chatbot():
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
     st.markdown("**🤖 Bot:** Hi there! Welcome to SRM EHR Patient Portal. How may I assist you today?")
 
     user_choice = st.radio("Choose an option:", [

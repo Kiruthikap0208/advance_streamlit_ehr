@@ -241,9 +241,10 @@ elif selected == "Profile & Settings":
             st.success("Profile updated successfully!")
     else:
         st.error("Profile not found.")
-        
-st.markdown("---")
-st.subheader("🤖 Need Help?")
-render_chatbot()
+
+if st.button("🤖 Need Help?"):
+    st.markdown("---")
+    st.subheader("🤖 I am here to assist you!")
+    render_chatbot()
 
 conn.close()
