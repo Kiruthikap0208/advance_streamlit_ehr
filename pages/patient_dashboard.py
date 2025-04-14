@@ -24,17 +24,33 @@ st.set_page_config(page_title="Patient Dashboard", layout="wide")
 
 st.markdown("""
     <style>
-    div[data-testid="stSidebarNav"] > ul { display: none; }
+    /* 1. Hide the default Streamlit multipage dropdown in the sidebar */
+    div[data-testid="stSidebarNav"] > ul {
+        display: none;
+    }
+    .stApp {
+        color: white !important;
+    }
+    /* 2. Make the sidebar background transparent and glassy */
     section[data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.3) !important;
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
-    section[data-testid="stSidebar"] * { color: #ffffff !important; }
-    #MainMenu, footer { visibility: hidden; }
+    button[kind="primary"], button[kind="secondary"] {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        color: white !important;
+        border: 1px solid white !important;
+    }
+
+    /* 4. Hide Streamlit footer and main menu */
+    #MainMenu, footer {
+        visibility: hidden;
+    }
     </style>
 """, unsafe_allow_html=True)
+
 
 with open("images/dashboard_bh_img.jpg", "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
@@ -50,6 +66,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 with st.sidebar:
+    st.markdown("---")
     selected = option_menu(
         menu_title=None,
         options=[
@@ -80,25 +97,6 @@ st.title("👤 Patient Dashboard")
 user_id = st.session_state.get("user_id")
 conn = create_connection()
 cursor = conn.cursor()
-
-from datetime import datetime, timedelta
-
-cursor.execute("""
-    SELECT a.appointment_time, d.name AS doctor_name, a.dept_name, a.building, a.room_no
-    FROM appointments a
-    JOIN users d ON a.doctor_id = d.id
-    WHERE a.patient_id = %s AND a.appointment_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
-    ORDER BY a.appointment_time
-""", (user_id,))
-
-reminders = cursor.fetchall()
-
-if reminders:
-    for appt_time, doc_name, dept, building, room in reminders:
-        st.info(f"🕒 {appt_time} — with Dr. {doc_name} | 🏥 {dept}, {building}, Room {room}")
-else:
-    st.success("No upcoming appointments.")
-
 
 if selected == "My Health Records":
     st.subheader("📋 Personal Health Info")
