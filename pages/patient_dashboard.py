@@ -248,56 +248,57 @@ components.html("""
 <style>
 #chat-button {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: 20px;
+  right: 20px;
   background-color: #4A90E2;
   color: white;
   border: none;
-  border-radius: 30px;
-  padding: 12px 20px;
-  font-size: 16px;
+  border-radius: 25px;
+  padding: 10px 16px;
+  font-size: 15px;
   cursor: pointer;
-  z-index: 9999;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 10000 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 #chat-popup {
   position: fixed;
-  bottom: 90px;
-  right: 30px;
-  width: 320px;
-  height: 420px;
-  background-color: #ffffff;
-  border-radius: 15px;
-  padding: 10px;
+  bottom: 70px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background-color: #fff;
+  border-radius: 10px;
   display: none;
   flex-direction: column;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  z-index: 9999;
+  padding: 10px;
+  z-index: 10000 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 #chat-log {
   flex-grow: 1;
   overflow-y: auto;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-size: 14px;
-  color: black;
+  color: #333;
+  max-height: 300px;
 }
 
 #chat-input {
   width: 100%;
-  height: 60px;
-  border-radius: 10px;
+  height: 50px;
+  border-radius: 8px;
   resize: none;
-  padding: 10px;
-  font-size: 14px;
+  padding: 8px;
+  font-size: 13px;
 }
 </style>
 
 <button id="chat-button">💬 Chat</button>
 
 <div id="chat-popup">
-  <div id="chat-log">Hi 👋 I can help you with appointments, reports, and more.<br><br></div>
+  <div id="chat-log">Hi 👋 Need help with appointments, reports, or more?<br><br></div>
   <textarea id="chat-input" placeholder="Type your message..."></textarea>
 </div>
 
@@ -317,17 +318,19 @@ input.addEventListener("keydown", function(e) {
     const userMsg = input.value.trim();
     if (userMsg) {
       log.innerHTML += `<div><b>You:</b> ${userMsg}</div>`;
-      let botReply = "❓ Sorry, I didn’t get that.";
-      const lower = userMsg.toLowerCase();
-      if (lower.includes("appointment")) {
-        botReply = "📅 You can book or check appointments from the dashboard.";
-      } else if (lower.includes("report")) {
-        botReply = "📂 Check the Reports tab to upload/download medical files.";
-      } else if (lower.includes("department")) {
-        botReply = "🏥 Our hospital includes Cardiology, Pediatrics, Neurology and more.";
-      } else if (lower.includes("contact")) {
-        botReply = "☎️ Contact us at +91-1234567890 or email support@hospital.com.";
+      let botReply = "🤖 I didn't get that.";
+      const msg = userMsg.toLowerCase();
+
+      if (msg.includes("appointment")) {
+        botReply = "📅 Go to Book Appointment or Appointments tab in the sidebar.";
+      } else if (msg.includes("report")) {
+        botReply = "📝 You can view or upload reports under the Reports tab.";
+      } else if (msg.includes("contact")) {
+        botReply = "☎️ Contact us at support@hospital.com or call 1234567890.";
+      } else if (msg.includes("department")) {
+        botReply = "🏥 We have departments like Cardiology, Neurology, Pediatrics, etc.";
       }
+
       log.innerHTML += `<div><b>Bot:</b> ${botReply}</div><br>`;
       input.value = "";
       log.scrollTop = log.scrollHeight;
@@ -336,5 +339,6 @@ input.addEventListener("keydown", function(e) {
 });
 </script>
 """, height=0, width=0)
+
 
 conn.close()
