@@ -129,7 +129,7 @@ if selected == "My Health Records":
     else:
         st.error("Patient record not found.")
 
-elif selected == "Book Appointment":
+elif selected == "Book Appointment": 
     st.subheader("📆 Book a New Appointment")
 
     # Step 1: Select Department
@@ -139,7 +139,7 @@ elif selected == "Book Appointment":
 
     # Step 2: Get doctors in that department
     cursor.execute("""
-        SELECT u.id, u.name
+        SELECT u.id, u.name, u.email
         FROM users u
         JOIN approved_doctors ad ON u.email = ad.email
         WHERE u.role = 'doctor' AND ad.department = %s
@@ -149,33 +149,36 @@ elif selected == "Book Appointment":
     if not doctor_list:
         st.warning("No doctors found in this department.")
     else:
-        doctor_map = {f"Dr. {name} ({doc_id})": doc_id for doc_id, name in doctor_list}
+        doctor_map = {f"Dr. {name} ({doc_id})": (doc_id, email) for doc_id, name, email in doctor_list}
         selected_doc_label = st.selectbox("Choose Doctor", list(doctor_map.keys()))
+        selected_doc_id, selected_doc_email = doctor_map[selected_doc_label]
 
         # Step 3: Select date and time
         appt_date = st.date_input("Select Date", min_value=date.today())
         appt_time = st.time_input("Select Time")
         notes = st.text_area("Reason for Visit / Notes")
 
-        # Get department building & room_no from departments table
+        # Step 4: Get department building & room using doctor's email
         cursor.execute("""
-            SELECT building, room_no FROM departments WHERE dept_name = %s
-        """, (selected_dept,))
+            SELECT d.building, d.rooms 
+            FROM departments d
+            JOIN approved_doctors ad ON ad.department = d.dept_name
+            WHERE ad.email = %s
+        """, (selected_doc_email,))
         dept_info = cursor.fetchone()
-        building, room_no = dept_info if dept_info else ("", "")
+        building, room = dept_info if dept_info else ("", "")
 
-        # Step 4: Submit appointment
+        # Step 5: Submit appointment
         if st.button("📅 Book Appointment"):
             appointment_datetime = datetime.combine(appt_date, appt_time)
-            selected_doc_id = doctor_map[selected_doc_label]
-
             cursor.execute("""
                 INSERT INTO appointments 
                 (patient_id, doctor_id, appointment_time, notes, dept_name, building, room_no)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """, (user_id, selected_doc_id, appointment_datetime, notes, selected_dept, building, room_no))
+            """, (user_id, selected_doc_id, appointment_datetime, notes, selected_dept, building, room))
             conn.commit()
             st.success("✅ Appointment booked successfully!")
+
 
 elif selected == "Reports":
     st.subheader("📂 My Medical Reports")
