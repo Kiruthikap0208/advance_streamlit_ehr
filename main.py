@@ -64,7 +64,7 @@ page_styles = f"""
     width: 30%;
     border-radius: 10px;
     background-color: #4A90E2;
-    color: white;
+    color: black;
     font-weight: bold;
     margin-top: 1rem;
     padding: 0.6rem;
