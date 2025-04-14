@@ -1,9 +1,22 @@
+# Core Streamlit setup
 streamlit==1.24.0
-openai
-rich==13.3.5
-streamlit-option-menu
-mysql-connector-python
 streamlit-extras
-streamlit-calendar==0.7.0
-streamlit-chat
+streamlit-option-menu
+streamlit-calendar
 
+# MySQL connector
+mysql-connector-python
+
+# Chatbot + OpenAI
+openai
+tiktoken
+
+# PDF/Report handling
+PyPDF2
+pillow<10.0.0   # Use binary wheel only, avoids zlib issues
+
+# Styling & Logs
+rich==13.3.5
+
+# Email (optional, used in your secrets)
+secure-smtplib
