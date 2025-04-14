@@ -167,11 +167,12 @@ elif selected == "Book Appointment":
                 if doc_result:
                     doctor_id = doc_result[0]
                     appointment_time = datetime.combine(appointment_date, appointment_time)
+                    notes = st.text_area("Reason for Visit")
                     # Insert appointment
                     cursor.execute("""
                         INSERT INTO appointments (patient_id, doctor_id, appointment_time, reason)
                         VALUES (%s, %s, %s, %s, %s)
-                    """, (patient_id, doctor_id, appointment_date, appointment_time, reason))
+                    """, (patient_id, doctor_id, appointment_date, appointment_time, notes))
                     conn.commit()
                     st.success("Appointment booked successfully!")
                 else:
