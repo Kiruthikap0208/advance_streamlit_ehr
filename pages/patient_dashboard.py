@@ -166,7 +166,7 @@ elif selected == "Book Appointment":
 
                 if doc_result:
                     doctor_id = doc_result[0]
-
+                    appointment_datetime = datetime.combine(appointment_date, appointment_time)
                     # Insert appointment
                     cursor.execute("""
                         INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, reason)
