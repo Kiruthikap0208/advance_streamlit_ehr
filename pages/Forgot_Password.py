@@ -5,7 +5,7 @@ import smtplib
 from email.mime.text import MIMEText
 import base64
 from streamlit_extras.switch_page_button import switch_page
-
+import os
 # ---------------- DB CONNECTION ----------------
 def create_connection():
     return mysql.connector.connect(
