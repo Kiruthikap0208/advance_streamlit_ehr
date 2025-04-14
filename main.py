@@ -24,7 +24,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Load background image
-with open("images\abstract-health-medical-science-healthcare-icon-digital-technology-science-concept-modern-innovation-treatment-medicine-on-hi-tech-future-blue-background-for-wallpaper-template-web-design-.jpg", "rb") as img_file:
+with open("images/main_bg_img", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
 # ----------- STYLING -----------
