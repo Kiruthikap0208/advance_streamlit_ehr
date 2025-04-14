@@ -30,26 +30,28 @@ with open("images/health-02.jpg", "rb") as img_file:
 # ----------- STYLING -----------
 st.markdown("""
     <style>
-        /* Apply dark theme to all page links */
         a[data-testid="stPageLink"] {
             display: inline-block;
-            background-color: #2C3E50;
+            background-color: #1B2631; /* Darker background */
             color: #ECF0F1 !important;
-            font-weight: bold;
-            padding: 0.7rem 1.2rem;
-            border-radius: 10px;
+            font-weight: 700;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
             text-decoration: none;
-            margin: 0.5rem 0;
-            font-size: 1rem;
+            margin: 0.75rem 0;
+            font-size: 1.1rem;
             text-align: center;
-            width: 250px;
-            border: 2px solid #1C1C1C !important;
+            width: 270px;
+            border: 4px solid #000000 !important;  /* Thick & dark border */
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
         }
 
         a[data-testid="stPageLink"]:hover {
-            background-color: #34495E;
-            color: #00ADB5 !important;
+            background-color: #283747;
+            color: #00E0FF !important;
+            border-color: #00E0FF !important;
         }
+
 
         .stApp {
             background-image: url("data:image/jpg;base64,""" + b64_img + """");
