@@ -34,7 +34,7 @@ st.markdown("""
         /* Apply dark theme to all Streamlit buttons */
         .stButton > button {
             background-color: #2C3E50 !important;  /* Dark slate blue */
-            color: #ECF0F1 !important;             /* Light text */
+            color: #122333 !important;             /* Light text */
             font-weight: bold !important;
             border: none !important;
             border-radius: 10px !important;
