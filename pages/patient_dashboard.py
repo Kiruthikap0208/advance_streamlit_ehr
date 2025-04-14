@@ -242,100 +242,99 @@ elif selected == "Profile & Settings":
 
 
 
-chat_html = """
+import streamlit.components.v1 as components
+
+components.html("""
 <style>
-#chat-toggle-btn {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    background-color: #4A90E2;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 30px;
-    cursor: pointer;
-    z-index: 9999;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    font-weight: bold;
+#chat-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #4A90E2;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-#chat-box {
-    position: fixed;
-    bottom: 80px;
-    right: 25px;
-    width: 300px;
-    height: 400px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    padding: 15px;
-    display: none;
-    flex-direction: column;
-    z-index: 9999;
+#chat-popup {
+  position: fixed;
+  bottom: 90px;
+  right: 30px;
+  width: 320px;
+  height: 420px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  padding: 10px;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 9999;
 }
 
-#chat-box textarea {
-    width: 100%;
-    height: 60px;
-    margin-top: auto;
-    border-radius: 10px;
-    padding: 10px;
-    resize: none;
-    font-size: 14px;
+#chat-log {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: black;
 }
 
-#chat-box .chat-log {
-    flex-grow: 1;
-    overflow-y: auto;
-    margin-bottom: 10px;
-    font-size: 14px;
-    color: black;
+#chat-input {
+  width: 100%;
+  height: 60px;
+  border-radius: 10px;
+  resize: none;
+  padding: 10px;
+  font-size: 14px;
 }
 </style>
 
-<button id="chat-toggle-btn">💬 Chat</button>
-<div id="chat-box">
-    <div class="chat-log" id="chat-log">Hi there! 👋<br>Ask me about appointments, reports, or departments.</div>
-    <textarea id="chat-input" placeholder="Type your message..."></textarea>
+<button id="chat-button">💬 Chat</button>
+
+<div id="chat-popup">
+  <div id="chat-log">Hi 👋 I can help you with appointments, reports, and more.<br><br></div>
+  <textarea id="chat-input" placeholder="Type your message..."></textarea>
 </div>
 
 <script>
-const toggleBtn = document.getElementById("chat-toggle-btn");
-const chatBox = document.getElementById("chat-box");
-const chatInput = document.getElementById("chat-input");
-const chatLog = document.getElementById("chat-log");
+const btn = document.getElementById("chat-button");
+const popup = document.getElementById("chat-popup");
+const input = document.getElementById("chat-input");
+const log = document.getElementById("chat-log");
 
-toggleBtn.onclick = () => {
-    chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+btn.onclick = () => {
+  popup.style.display = popup.style.display === "flex" ? "none" : "flex";
 };
 
-chatInput.addEventListener("keydown", function(e) {
-    if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        const msg = chatInput.value.trim();
-        if (msg) {
-            chatLog.innerHTML += `<div><strong>You:</strong> ${msg}</div>`;
-            // Handle basic keyword response
-            let response = "Sorry, I didn’t understand.";
-            if (msg.toLowerCase().includes("appointment")) {
-                response = "📅 You can book or view appointments from the main menu.";
-            } else if (msg.toLowerCase().includes("report")) {
-                response = "📂 You can upload or download reports under the Reports section.";
-            } else if (msg.toLowerCase().includes("department")) {
-                response = "🏥 We have departments like Cardiology, Pediatrics, etc.";
-            } else if (msg.toLowerCase().includes("contact")) {
-                response = "📞 Please contact the hospital help desk for further assistance.";
-            }
-            chatLog.innerHTML += `<div><strong>Bot:</strong> ${response}</div>`;
-            chatInput.value = "";
-            chatLog.scrollTop = chatLog.scrollHeight;
-        }
+input.addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    const userMsg = input.value.trim();
+    if (userMsg) {
+      log.innerHTML += `<div><b>You:</b> ${userMsg}</div>`;
+      let botReply = "❓ Sorry, I didn’t get that.";
+      const lower = userMsg.toLowerCase();
+      if (lower.includes("appointment")) {
+        botReply = "📅 You can book or check appointments from the dashboard.";
+      } else if (lower.includes("report")) {
+        botReply = "📂 Check the Reports tab to upload/download medical files.";
+      } else if (lower.includes("department")) {
+        botReply = "🏥 Our hospital includes Cardiology, Pediatrics, Neurology and more.";
+      } else if (lower.includes("contact")) {
+        botReply = "☎️ Contact us at +91-1234567890 or email support@hospital.com.";
+      }
+      log.innerHTML += `<div><b>Bot:</b> ${botReply}</div><br>`;
+      input.value = "";
+      log.scrollTop = log.scrollHeight;
     }
+  }
 });
 </script>
-"""
-
-components.html(chat_html, height=0, width=0)
-
+""", height=0, width=0)
 
 conn.close()
