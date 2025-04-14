@@ -1,14 +1,6 @@
 import streamlit as st
 
 def render_chatbot():
-    # your existing chatbot UI and logic
-    st.markdown("""
-    <style>
-    .chat-container {
-        ...
-    </style>
-    """, unsafe_allow_html=True)
-
     # Rule-based chatbot logic
     faq_responses = {
         "book appointment": "To book an appointment, go to the 'Book Appointment' tab in the sidebar.",
@@ -26,7 +18,7 @@ def render_chatbot():
                 return response
         return "I'm sorry, I couldn't understand that. Please try asking differently."
 
-    # Modern chatbot box style
+    # Modern chatbot UI styling
     st.markdown("""
     <style>
     .chat-container {
@@ -54,7 +46,6 @@ def render_chatbot():
     """, unsafe_allow_html=True)
 
     st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
-
     st.markdown("**🤖 Bot:** Hi there! Welcome to SRM EHR Patient Portal. How may I assist you today?")
 
     user_choice = st.radio("Choose an option:", [
