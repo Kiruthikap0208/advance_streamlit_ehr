@@ -8,7 +8,10 @@ import base64
 import calendar
 import streamlit_calendar as st_cal
 import streamlit.components.v1 as components
+from chatbot_component import render_chatbot
 
+
+api_key = st.secrets["openai"]["api_key"]
 
 def create_connection():
     return mysql.connector.connect(
@@ -242,65 +245,7 @@ elif selected == "Profile & Settings":
 
 
 
-from streamlit_chat import message
-import streamlit as st
-
-# Initialize chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# Add a fixed position button using CSS
-with st.container():
-    st.markdown("""
-        <style>
-        .chat-button {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            background-color: #4A90E2;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 16px;
-            font-size: 16px;
-            cursor: pointer;
-            z-index: 10000;
-        }
-        </style>
-        <script>
-            const chatArea = window.parent.document.querySelector("section.main");
-            if (chatArea) {
-                chatArea.scrollTop = chatArea.scrollHeight;
-            }
-        </script>
-    """, unsafe_allow_html=True)
-
-    chat_toggle = st.button("💬 Chat with Assistant", key="chat_button")
-
-if chat_toggle or st.session_state.get("chat_open", False):
-    st.session_state.chat_open = True
-    with st.expander("🤖 Need help? Ask me anything!", expanded=True):
-        for i, (msg, is_user) in enumerate(st.session_state.messages):
-            message(msg, is_user=is_user, key=f"msg_{i}")
-
-        user_input = st.text_input("Your message", key="user_input")
-        if user_input:
-            st.session_state.messages.append((user_input, True))
-
-            # Simple keyword response
-            response = "🤖 I didn't understand that. Try 'book appointment' or 'my reports'."
-            if "appointment" in user_input.lower():
-                response = "📅 You can book or view appointments from the sidebar."
-            elif "report" in user_input.lower():
-                response = "📝 Check or upload your reports in the Reports tab."
-            elif "prescription" in user_input.lower():
-                response = "💊 Your prescriptions are in the Prescriptions tab."
-            elif "profile" in user_input.lower():
-                response = "👤 You can update your profile info in the Profile & Settings section."
-            elif "contact" in user_input.lower():
-                response = "📞 You can reach us at support@healthapp.com"
-
-            st.session_state.messages.append((response, False))
-
+if "user_id" in st.session_state and st.session_state.get("role") == "patient":
+    render_chatbot()
 
 conn.close()
