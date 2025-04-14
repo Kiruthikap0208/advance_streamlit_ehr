@@ -1,10 +1,8 @@
 import streamlit as st
 import openai
 
-# Load OpenAI API Key
 openai.api_key = st.secrets["openai"]["api_key"]
 
-# FAQ handler
 def handle_faq(prompt):
     prompt = prompt.lower()
     if "book" in prompt and "appointment" in prompt:
@@ -19,7 +17,6 @@ def handle_faq(prompt):
         return "Please contact our support team at support@ehrhospital.com."
     return None
 
-# OpenAI fallback
 def ask_openai(prompt):
     try:
         response = openai.ChatCompletion.create(
@@ -32,66 +29,50 @@ def ask_openai(prompt):
     except Exception as e:
         return f"Sorry, something went wrong: {e}"
 
-# Render Chatbot as Popup UI
 def render_chatbot_popup():
-    # Chatbot Toggle
     st.markdown("""
         <style>
-            .chatbot-toggle {
+            .chatbot-button {
                 position: fixed;
                 bottom: 25px;
                 right: 30px;
-                z-index: 1001;
-                background-color: #FF4B4B;
+                z-index: 9999;
+            }
+            .chatbot-box {
+                position: fixed;
+                bottom: 90px;
+                right: 30px;
+                width: 320px;
+                background: rgba(30,30,30,0.95);
+                padding: 15px;
+                border-radius: 15px;
                 color: white;
-                border-radius: 50%;
-                width: 55px;
-                height: 55px;
-                font-size: 28px;
-                text-align: center;
-                line-height: 55px;
-                cursor: pointer;
-                box-shadow: 0px 0px 12px rgba(0,0,0,0.3);
+                z-index: 9998;
+                box-shadow: 0 0 10px rgba(0,0,0,0.5);
             }
         </style>
-        <div class='chatbot-toggle' onclick="window.dispatchEvent(new Event('toggle-chatbot'))">💬</div>
-        <script>
-            const streamlitEvents = window.streamlitEvents || {};
-            window.streamlitEvents = streamlitEvents;
-
-            let visible = false;
-            window.addEventListener("toggle-chatbot", function() {
-                visible = !visible;
-                Streamlit.setComponentValue(visible);
-            });
-        </script>
     """, unsafe_allow_html=True)
 
-    # Use Streamlit component value to toggle visibility
-    visible = st.session_state.get("show_chat", False)
+    with st.container():
+        col1, col2, col3 = st.columns([7, 1, 1])
+        with col3:
+            if st.button("💬", key="toggle_chat_button"):
+                st.session_state.show_chat = not st.session_state.get("show_chat", False)
 
-    # Show chatbot
-    if visible:
-        st.markdown("""
-            <div style='position: fixed; bottom: 90px; right: 30px; width: 320px;
-                        background: rgba(30,30,30,0.95); padding: 15px; border-radius: 15px;
-                        color: white; z-index: 9999; box-shadow: 0 0 10px rgba(0,0,0,0.5);'>
-                <h4>🤖 EHR Assistant</h4>
-        """, unsafe_allow_html=True)
+    if st.session_state.get("show_chat", False):
+        with st.container():
+            st.markdown("<div class='chatbot-box'>", unsafe_allow_html=True)
+            st.markdown("#### 🤖 EHR Assistant")
 
-        user_input = st.text_input("Ask something...", key="popup_chat")
-        if user_input:
-            response = handle_faq(user_input) or ask_openai(user_input)
-            st.markdown(f"**You:** {user_input}")
-            st.markdown(f"**Bot:** {response}")
+            user_input = st.text_input("Ask something...", key="chat_input")
+            if user_input:
+                reply = handle_faq(user_input) or ask_openai(user_input)
+                st.markdown(f"**You:** {user_input}")
+                st.markdown(f"**Bot:** {reply}")
 
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-# Update chatbot toggle state
 def update_toggle_state():
     if "show_chat" not in st.session_state:
         st.session_state.show_chat = False
 
-# Call this in your main patient dashboard
-update_toggle_state()
-render_chatbot_popup()
