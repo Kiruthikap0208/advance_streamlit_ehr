@@ -1,7 +1,7 @@
 import streamlit as st
 import base64
 import mysql.connector
-
+import os
 # ----------- DB CONNECTION -----------
 def create_connection():
     conn = mysql.connector.connect(
@@ -24,7 +24,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Load background image
-with open("images/main_bg_img", "rb") as img_file:
+
+img_path = os.path.join("images", "main_bg_img.jpg")
+with open(img_path, "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
 # ----------- STYLING -----------
