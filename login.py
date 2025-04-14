@@ -39,8 +39,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Load background image
-with open(r"Kiruthikap0208/advance_streamlit_ehr/images/copy-space-heart-shape-stethoscope.jpg", "rb") as img_file:
+img_path = os.path.join("images", "default_login.jpg")
+with open(img_path, "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
 # ----------- STYLING -----------
