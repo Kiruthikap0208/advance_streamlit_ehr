@@ -66,8 +66,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# Set background image
-with open("images/dashboard_bh_img.jpg", "rb") as img_file:
+img_path = os.path.join("images", "dashboard_bh_img.jpg")
+with open(img_path, "rb") as img_file:
     bg_image = base64.b64encode(img_file.read()).decode()
 
 st.markdown(f"""
