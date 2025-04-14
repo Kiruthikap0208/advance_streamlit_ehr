@@ -35,7 +35,8 @@ st.markdown("""
             background-color: rgba(255, 255, 255, 0.95);
             padding: 3rem 2.5rem;
             border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.95);
+
         /* Style for page_link() hyperlinks */
         a[data-testid="stPageLink"] {
             display: inline-block;
