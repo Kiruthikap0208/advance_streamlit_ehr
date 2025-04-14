@@ -24,35 +24,44 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Load background image
-with open("images/health-02.jpg", "rb") as img_file:
+with open("images\abstract-health-medical-science-healthcare-icon-digital-technology-science-concept-modern-innovation-treatment-medicine-on-hi-tech-future-blue-background-for-wallpaper-template-web-design-.jpg", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
 # ----------- STYLING -----------
-# Apply same button style as main login page
 st.markdown("""
     <style>
-        /* Custom button style */
-        .stButton>button {
-            background-color: #0e1117;
-            color: #ECF0F1;
-            border: 3px solid black;
-            padding: 0.6rem 1.2rem;
-            border-radius: 10px;
+        /* Apply dark theme to all page links */
+        a[data-testid="stPageLink"] {
+            display: inline-block;
+            background-color: #2C3E50;
+            color: #ECF0F1 !important;
             font-weight: bold;
-            font-size: 16px;
-            width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+            padding: 0.7rem 1.2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            text-align: center;
+            width: 250px;
+            border: 2px solid #1C1C1C !important;
         }
 
-        .stButton>button:hover {
-            background-color: #20242c;
-            color: #00E0FF;
-            border-color: #00E0FF;
+        a[data-testid="stPageLink"]:hover {
+            background-color: #34495E;
+            color: #00ADB5 !important;
         }
 
-        /* Optional: Hide Streamlit branding */
-        header, footer { visibility: hidden; }
+        .stApp {
+            background-image: url("data:image/jpg;base64,""" + b64_img + """");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .stMarkdown h2, .stMarkdown h3 {
+            color: white;
+            text-shadow: 1px 1px 2px #00000088;
+        }
     </style>
 """, unsafe_allow_html=True)
 
