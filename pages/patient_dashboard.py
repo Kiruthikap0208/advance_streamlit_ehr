@@ -9,11 +9,9 @@ import base64
 import calendar
 import streamlit_calendar as st_cal
 import streamlit.components.v1 as components
-from chatbot_component import chatbot_ui
-chatbot_ui()
+from chatbot_component import chatbot
 
-
-api_key = st.secrets["openai"]["api_key"]
+chatbot(patient_id=st.session_state.get("user_id"))
 
 def create_connection():
     return mysql.connector.connect(
