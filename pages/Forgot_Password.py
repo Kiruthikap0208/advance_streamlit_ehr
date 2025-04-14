@@ -130,7 +130,7 @@ with col3:
         if st.button("Verify OTP"):
             if entered_otp == st.session_state.generated_otp:
                 st.success("OTP Verified. Redirecting to reset password...")
-                switch_page("reset password")
+                st.page_link("pages/Reset_password.py", label="Reset Password")
             else:
                 st.error("Incorrect OTP. Please try again.")
 
