@@ -120,47 +120,62 @@ if selected == "My Health Records":
 elif selected == "Book Appointment":
     st.subheader("📅 Book a New Appointment")
 
-    patient_id = st.session_state.get("user_id")
-    if not patient_id:
-        st.error("You must be logged in to book an appointment.")
-    else:
-        # 1. Get unique list of departments
-        cursor.execute("SELECT DISTINCT department FROM approved_doctors")
-        departments = [row[0] for row in cursor.fetchall()]
+    # Connect DB
+    conn = create_connection()
+    cursor = conn.cursor()
 
+    # Select department first
+    cursor.execute("SELECT DISTINCT department FROM approved_doctors")
+    departments = [row[0] for row in cursor.fetchall()]
+
+    if not departments:
+        st.warning("No departments found.")
+    else:
         selected_dept = st.selectbox("Choose Department", departments)
 
-        if selected_dept:
-            # 2. Get available doctors in this department
-            cursor.execute("""
-                SELECT u.id, u.name 
-                FROM users u
-                JOIN approved_doctors ad ON u.id = ad.id
-                WHERE ad.department = %s AND u.role = 'doctor'
-            """, (selected_dept,))
-            doctors = cursor.fetchall()
+        # Fetch doctors in this department by joining on email
+        cursor.execute("""
+            SELECT u.name, u.email
+            FROM users u
+            JOIN approved_doctors ad ON u.email = ad.email
+            WHERE ad.department = %s AND u.role = 'doctor'
+        """, (selected_dept,))
+        doctors = cursor.fetchall()
 
-            if not doctors:
-                st.warning("🚫 No doctors available in this department.")
-            else:
-                doc_names = {name: doc_id for doc_id, name in doctors}
-                selected_doc_name = st.selectbox("Choose Doctor", list(doc_names.keys()))
-                selected_doc_id = doc_names[selected_doc_name]
+        if not doctors:
+            st.warning("No doctors available in this department.")
+        else:
+            doc_names = [doc[0] for doc in doctors]
+            selected_doc = st.selectbox("Choose Doctor", doc_names)
 
-                # 3. Choose date, time and reason
-                appt_date = st.date_input("Choose Date")
-                appt_time = st.time_input("Choose Time")
-                reason = st.text_area("Reason for Appointment")
+            appointment_date = st.date_input("Appointment Date")
+            appointment_time = st.time_input("Appointment Time")
 
-                if st.button("Confirm Appointment"):
-                    # Insert appointment into DB
+            reason = st.text_area("Reason for Appointment")
+
+            if st.button("Book Appointment"):
+                # Get patient ID from session
+                patient_id = st.session_state.get("user_id")  # This will be like 'p_1'
+
+                # Get selected doctor's email
+                selected_doc_email = [doc[1] for doc in doctors if doc[0] == selected_doc][0]
+
+                # Get doctor ID from users using email
+                cursor.execute("SELECT id FROM users WHERE email = %s AND role = 'doctor'", (selected_doc_email,))
+                doc_result = cursor.fetchone()
+
+                if doc_result:
+                    doctor_id = doc_result[0]
+
+                    # Insert appointment
                     cursor.execute("""
-                        INSERT INTO appointments (patient_id, doctor_id, date, time, reason)
+                        INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, reason)
                         VALUES (%s, %s, %s, %s, %s)
-                    """, (patient_id, selected_doc_id, appt_date, appt_time, reason))
+                    """, (patient_id, doctor_id, appointment_date, appointment_time, reason))
                     conn.commit()
-                    st.success("✅ Appointment booked successfully!")
-
+                    st.success("Appointment booked successfully!")
+                else:
+                    st.error("Selected doctor not found.")
 
 
 elif selected == "Reports":
