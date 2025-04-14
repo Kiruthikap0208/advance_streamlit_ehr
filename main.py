@@ -30,57 +30,45 @@ with open("images/health-02.jpg", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
 # ----------- STYLING -----------
-page_styles = f"""
-<style>
-.stApp {{
-    background-image: url("data:image/jpg;base64,{b64_img}");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}}
+st.markdown(f"""
+    <style>
+        .stApp {{
+            background-image: url("data:image/jpg;base64,{b64_img}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }}
 
-.container {{
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    height: 100vh;
-    padding-right: 5vw;
-}}
+        .stButton > button {{
+            background-color: #222831;
+            color: #ffffff;
+            font-weight: bold;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            transition: 0.3s ease;
+            font-size: 1rem;
+            width: 50%;
+            margin-top: 1rem;
+        }}
 
-.login-box {{
-    background-color: rgba(255, 255, 255, 0.95);
-    padding: 3rem 2.5rem;
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    width: 400px;
-}}
+        .stButton > button:hover {{
+            background-color: #393e46;
+            color: #00adb5;
+            cursor: pointer;
+        }}
 
-.login-box h2 {{
-    text-align: center;
-    margin-bottom: 2rem;
-}}
-
-.stButton button {{
-    width: 30%;
-    border-radius: 10px;
-    background-color: #4A90E2;
-    color: white;
-    font-weight: bold;
-    margin-top: 1rem;
-    padding: 0.6rem;
-    font-size: 1rem;
-}}
-</style>
-"""
-st.markdown(page_styles, unsafe_allow_html=True)
+        .stMarkdown h2, .stMarkdown h3 {{
+            color: white;
+            text-shadow: 1px 1px 2px #00000088;
+        }}
+    </style>
+""", unsafe_allow_html=True)
 
 # ----------- MAIN CONTENT -----------
-
 st.markdown("## 🩺 SRM Electronic Health Records")
 st.markdown("### Choose your login portal")
 
 st.page_link("pages/login_doctor.py", label="👨‍⚕️ Doctor Portal", icon="🧑‍⚕️")
 st.page_link("pages/login_admin.py", label="🧑‍💼 Admin / Receptionist Portal", icon="📋")
 st.page_link("pages/login_patient.py", label="🧑‍🦽 Patient Portal", icon="🩺")
-
-st.markdown('</div></div>', unsafe_allow_html=True)
