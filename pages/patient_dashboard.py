@@ -241,8 +241,9 @@ elif selected == "Profile & Settings":
             st.success("Profile updated successfully!")
     else:
         st.error("Profile not found.")
-
-if "user_id" in st.session_state and st.session_state.get("role") == "patient":
-    render_chatbot()
+        
+st.markdown("---")
+st.subheader("🤖 Need Help?")
+render_chatbot()
 
 conn.close()
