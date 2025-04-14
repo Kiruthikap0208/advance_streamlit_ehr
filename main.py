@@ -29,7 +29,7 @@ st.markdown("""
 with open("images/health-02.jpg", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
-# ----------- STYLING -----------
+# ----------- GLOBAL STYLING -----------
 st.markdown(f"""
     <style>
         .stApp {{
@@ -39,25 +39,23 @@ st.markdown(f"""
             background-attachment: fixed;
         }}
 
-        .stButton > button {{
-            background-color: #222831;
-            color: #ffffff;
-            font-weight: bold;
-            border: none;
-            padding: 0.7rem 1.5rem;
-            border-radius: 10px;
+        /* Make ALL buttons dark */
+        button[kind="primary"], .stButton > button {{
+            background-color: #222831 !important;
+            color: #ffffff !important;
+            font-weight: bold !important;
+            border: none !important;
+            border-radius: 10px !important;
             transition: 0.3s ease;
-            font-size: 1rem;
-            width: 50%;
-            margin-top: 1rem;
         }}
 
-        .stButton > button:hover {{
-            background-color: #393e46;
-            color: #00adb5;
+        button[kind="primary"]:hover, .stButton > button:hover {{
+            background-color: #393e46 !important;
+            color: #00adb5 !important;
             cursor: pointer;
         }}
 
+        /* Headings color */
         .stMarkdown h2, .stMarkdown h3 {{
             color: white;
             text-shadow: 1px 1px 2px #00000088;
