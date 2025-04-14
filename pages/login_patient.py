@@ -112,7 +112,7 @@ with col3:
             st.session_state.logged_in = True
             st.session_state.user_email = email
             st.session_state.user_id = user[0]
-            switch_page("patient dashboard")  # Keeps programmatic redirection
+            st.page_link("pages/2_Doctor_Dashboard.py", label="Go to Dashboard")
         else:
             st.error("Invalid credentials or not a patient.")
 
