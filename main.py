@@ -30,40 +30,25 @@ with open("images/health-02.jpg", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
 # ----------- GLOBAL STYLING -----------
-st.markdown(f"""
+st.markdown("""
     <style>
-        .stApp {{
-            background-image: url("data:image/jpg;base64,{b64_img}");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-        }}
-
-        button[kind="primary"]:hover, .stButton > button:hover {{
-            background-color: #393e46 !important;
-            color: #00adb5 !important;
-            cursor: pointer;
-        }}
-
-        /* Headings color */
-        .stMarkdown h2, .stMarkdown h3 {{
-            color: white;
-            text-shadow: 1px 1px 2px #00000088;
-        }}
-    </style>
-""", unsafe_allow_html=True)
-
-st.markdown(f"""
-    <style>
-        /* Make ALL buttons dark with soft blue tint */
-        button[kind="primary"], .stButton > button {{
-            background-color: #2C3E50 !important;
-            color: #ECF0F1 !important;
+        /* Apply dark theme to all Streamlit buttons */
+        .stButton > button {
+            background-color: #2C3E50 !important;  /* Dark slate blue */
+            color: #ECF0F1 !important;             /* Light text */
             font-weight: bold !important;
             border: none !important;
             border-radius: 10px !important;
-            transition: 0.3s ease;
-        }}
+            padding: 0.6rem 1.2rem !important;
+            font-size: 1rem !important;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Hover effect */
+        .stButton > button:hover {
+            background-color: #34495E !important;  /* Slightly lighter */
+            color: #00ADB5 !important;             /* Cyan accent */
+        }
     </style>
 """, unsafe_allow_html=True)
 
