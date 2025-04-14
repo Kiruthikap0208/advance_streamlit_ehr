@@ -83,29 +83,19 @@ cursor = conn.cursor()
 
 from datetime import datetime, timedelta
 
-st.subheader("🔔 Your Appointments in Next 24 Hours")
-
-now = datetime.now()
-next_day = now + timedelta(days=1)
-
 cursor.execute("""
-    SELECT 
-        a.appointment_time, 
-        u.name AS doctor_name, 
-        a.dept_name,
-        a.building,
-        a.room_no
+    SELECT a.appointment_time, d.name AS doctor_name, a.dept_name, a.building, a.room_no
     FROM appointments a
-    JOIN users u ON a.doctor_id = u.id
-    WHERE a.patient_id = %s AND a.appointment_time BETWEEN %s AND %s
+    JOIN users d ON a.doctor_id = d.id
+    WHERE a.patient_id = %s AND a.appointment_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
     ORDER BY a.appointment_time
-""", (user_id, now, next_day))
+""", (user_id,))
 
 reminders = cursor.fetchall()
 
 if reminders:
-    for appt_time, dname, dept, building, room in reminders:
-        st.info(f"🕒 {appt_time.strftime('%Y-%m-%d %H:%M')} — with Dr. {dname} ({dept}, {building}, Room {room})")
+    for appt_time, doc_name, dept, building, room in reminders:
+        st.info(f"🕒 {appt_time} — with Dr. {doc_name} | 🏥 {dept}, {building}, Room {room}")
 else:
     st.success("No upcoming appointments.")
 
@@ -211,7 +201,7 @@ elif selected == "Appointments":
                d.name AS doctor_name, ad.department
         FROM appointments a
         JOIN users d ON a.doctor_id = d.id
-        JOIN approved_doctors ad ON d.id = ad.id
+        JOIN approved_doctors ad ON d.email = ad.email
         WHERE a.patient_id = %s
         ORDER BY a.appointment_time DESC
     """, (user_id,))
@@ -226,7 +216,7 @@ elif selected == "Appointments":
 
             with st.container():
                 st.markdown(f"""
-                    <div style='border-left: 5px solid {color}; padding-left: 10px; margin-bottom: 15px;'>
+                    <div style='border-left: 5px solid {color}; padding-left: 10px; margin-bottom: 15px; color:white'>
                         <strong>Doctor:</strong> {doctor_name} ({department})<br>
                         <strong>Date & Time:</strong> {appt_time.strftime("%Y-%m-%d %H:%M")}<br>
                         <strong>Notes:</strong> {notes or '—'}
