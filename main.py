@@ -8,9 +8,7 @@ def create_connection():
         host=st.secrets["mysql"]["host"],
         user=st.secrets["mysql"]["user"],
         password=st.secrets["mysql"]["password"],
-        database=st.secrets["mysql"]["database"],
-        port=st.secrets["mysql"]["port"],
-        auth_plugin='mysql_native_password'
+        database=st.secrets["mysql"]["database"]
     )
     return conn
 
@@ -29,19 +27,14 @@ st.markdown("""
 with open("images/health-02.jpg", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
+# ----------- STYLING -----------
 st.markdown("""
     <style>
-        .login-box {{
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 3rem 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.95);
-
-        /* Style for page_link() hyperlinks */
+        /* Apply dark theme to all page links */
         a[data-testid="stPageLink"] {
             display: inline-block;
-            background-color: #0d3438;         /* Updated to your preferred color */
-            color: #ECF0F1 !important;         /* Light text */
+            background-color: #2C3E50;
+            color: #ECF0F1 !important;
             font-weight: bold;
             padding: 0.7rem 1.2rem;
             border-radius: 10px;
@@ -53,29 +46,21 @@ st.markdown("""
         }
 
         a[data-testid="stPageLink"]:hover {
-            background-color: #1e5c60;         /* Slightly lighter hover effect */
-            color: #00ADB5 !important;         /* Cyan hover text */
+            background-color: #34495E;
+            color: #00ADB5 !important;
         }
-    </style>
-""", unsafe_allow_html=True)
 
-
-
-# ----------- GLOBAL STYLING -----------
-st.markdown(f"""
-    <style>
-        .stApp {{
-            background-image: url("data:image/jpg;base64,{b64_img}");
+        .stApp {
+            background-image: url("data:image/jpg;base64,""" + b64_img + """");
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
-        }}
-        
-        /* Headings color */
-        .stMarkdown h2, .stMarkdown h3 {{
+        }
+
+        .stMarkdown h2, .stMarkdown h3 {
             color: white;
             text-shadow: 1px 1px 2px #00000088;
-        }}
+        }
     </style>
 """, unsafe_allow_html=True)
 
