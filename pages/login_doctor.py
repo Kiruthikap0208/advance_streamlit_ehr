@@ -1,7 +1,7 @@
 import streamlit as st
 import mysql.connector
 import base64
-from streamlit_extras.switch_page_button import switch_page
+
 
 def create_connection():
     return mysql.connector.connect(
@@ -97,6 +97,7 @@ st.markdown(f"""
 
 col1, col2, col3 = st.columns([1, 1, 2.2])
 with col3:
+    st.markdown('<div class="form-box">', unsafe_allow_html=True)
 
     st.title("👨‍⚕️ Doctor Login")
     email = st.text_input("Email")
@@ -109,14 +110,14 @@ with col3:
             st.session_state.logged_in = True
             st.session_state.user_email = email
             st.session_state.user_id = user[0]
-            switch_page("doctor dashboard")
+            st.page_link("pages/doctor_dashboard.py")
+
         else:
             st.error("Invalid credentials or not a doctor.")
-            
-    if st.button("Forgot password?"):
-        switch_page("Forgot_Password")
 
-    if st.button("Don't have an account? Sign up"):
-        switch_page("signup doctor")
+    # Navigation links using st.page_link
+    st.page_link("pages/Forgot_Password.py", label="🔐 Forgot Password?", icon="🔁")
+    st.page_link("pages/signup_doctor.py", label="📝 Don't have an account? Sign Up", icon="➕")
 
     st.markdown("</div>", unsafe_allow_html=True)
+
