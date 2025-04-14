@@ -27,50 +27,44 @@ st.markdown("""
 with open("images/health-02.jpg", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
-page_styles = f"""
-<style>
-.stApp {{
-    background-image: url("data:image/jpg;base64,{b64_img}");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}}
+# ----------- STYLING -----------
+st.markdown("""
+    <style>
+        /* Apply dark theme to all page links */
+        a[data-testid="stPageLink"] {
+            display: inline-block;
+            background-color: #2C3E50;
+            color: #ECF0F1 !important;
+            font-weight: bold;
+            padding: 0.7rem 1.2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            text-align: center;
+            width: 250px;
+            border: 2px solid #1C1C1C !important;
+        }
 
-.login-box {{
-    background-color: rgba(255, 255, 255, 0.95);
-    padding: 3rem 2.5rem;
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}}
+        a[data-testid="stPageLink"]:hover {
+            background-color: #34495E;
+            color: #00ADB5 !important;
+        }
 
-h1 {{
-    text-align: center;
-    color: #222;
-}}
+        .stApp {
+            background-image: url("data:image/jpg;base64,""" + b64_img + """");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
 
-.stTextInput > div > input {{
-    background-color: #f0f2f6;
-    padding: 0.75rem;
-    border-radius: 10px;
-}}
+        .stMarkdown h2, .stMarkdown h3 {
+            color: white;
+            text-shadow: 1px 1px 2px #00000088;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-.stButton button {{
-    width: 100%;
-    border-radius: 10px;
-    background-color: #4A90E2;
-    color: white;
-    font-weight: bold;
-    margin-top: 1rem;
-}}
-
-a {{
-    color: #4A90E2;
-    text-decoration: none;
-    font-size: 0.9rem;
-}}
-</style>
-"""
-st.markdown(page_styles, unsafe_allow_html=True)
 # ----------- MAIN CONTENT -----------
 st.markdown("## 🩺 SRM Electronic Health Records")
 st.markdown("### Choose your login portal")
