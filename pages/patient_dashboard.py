@@ -8,8 +8,10 @@ import base64
 import calendar
 import streamlit_calendar as st_cal
 import streamlit.components.v1 as components
-from chatbot_component import render_chatbot
+from chatbot_component import render_chatbot_popup, update_toggle_state
 
+update_toggle_state()
+render_chatbot_popup()
 
 api_key = st.secrets["openai"]["api_key"]
 

@@ -1,10 +1,10 @@
 import streamlit as st
 import openai
 
-# Load API key from Streamlit secrets
+# Load OpenAI API Key
 openai.api_key = st.secrets["openai"]["openai_api_key"]
 
-# Define prebuilt actions
+# FAQ handler
 def handle_faq(prompt):
     prompt = prompt.lower()
     if "book" in prompt and "appointment" in prompt:
@@ -19,62 +19,79 @@ def handle_faq(prompt):
         return "Please contact our support team at support@ehrhospital.com."
     return None
 
-# OpenAI assistant fallback
+# OpenAI fallback
 def ask_openai(prompt):
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # or gpt-4 if you prefer
+            model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
-            max_tokens=200
+            max_tokens=150
         )
         return response.choices[0].message["content"].strip()
     except Exception as e:
-        return f"Sorry, there was a problem reaching the assistant. ({str(e)})"
+        return f"Sorry, something went wrong: {e}"
 
-# Chatbot UI logic
-def render_chatbot():
-    with st.container():
-        st.markdown("""
+# Render Chatbot as Popup UI
+def render_chatbot_popup():
+    # Chatbot Toggle
+    st.markdown("""
         <style>
-            .chatbot-popup {
+            .chatbot-toggle {
                 position: fixed;
-                bottom: 20px;
-                right: 25px;
-                width: 320px;
-                background-color: rgba(0, 0, 0, 0.85);
+                bottom: 25px;
+                right: 30px;
+                z-index: 1001;
+                background-color: #FF4B4B;
                 color: white;
-                border-radius: 15px;
-                padding: 15px;
-                z-index: 9999;
-                box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
-            }
-            .chatbot-popup h4 {
-                margin-top: 0;
-                font-size: 18px;
-                color: #fff;
-            }
-            .chatbot-input input {
-                background: rgba(255,255,255,0.1);
-                border: none;
-                color: white;
-                border-radius: 8px;
-                padding: 8px;
-                width: 100%;
-                margin-top: 10px;
+                border-radius: 50%;
+                width: 55px;
+                height: 55px;
+                font-size: 28px;
+                text-align: center;
+                line-height: 55px;
+                cursor: pointer;
+                box-shadow: 0px 0px 12px rgba(0,0,0,0.3);
             }
         </style>
+        <div class='chatbot-toggle' onclick="window.dispatchEvent(new Event('toggle-chatbot'))">💬</div>
+        <script>
+            const streamlitEvents = window.streamlitEvents || {};
+            window.streamlitEvents = streamlitEvents;
+
+            let visible = false;
+            window.addEventListener("toggle-chatbot", function() {
+                visible = !visible;
+                Streamlit.setComponentValue(visible);
+            });
+        </script>
+    """, unsafe_allow_html=True)
+
+    # Use Streamlit component value to toggle visibility
+    visible = st.session_state.get("show_chat", False)
+
+    # Show chatbot
+    if visible:
+        st.markdown("""
+            <div style='position: fixed; bottom: 90px; right: 30px; width: 320px;
+                        background: rgba(30,30,30,0.95); padding: 15px; border-radius: 15px;
+                        color: white; z-index: 9999; box-shadow: 0 0 10px rgba(0,0,0,0.5);'>
+                <h4>🤖 EHR Assistant</h4>
         """, unsafe_allow_html=True)
 
-        with st.container():
-            st.markdown("<div class='chatbot-popup'>", unsafe_allow_html=True)
-            st.markdown("#### 🤖 EHR Assistant")
-            
-            user_input = st.text_input("Ask a question", key="chat_input")
-            if user_input:
-                faq_reply = handle_faq(user_input)
-                response = faq_reply or ask_openai(user_input)
-                st.markdown(f"**You:** {user_input}")
-                st.markdown(f"**Bot:** {response}")
+        user_input = st.text_input("Ask something...", key="popup_chat")
+        if user_input:
+            response = handle_faq(user_input) or ask_openai(user_input)
+            st.markdown(f"**You:** {user_input}")
+            st.markdown(f"**Bot:** {response}")
 
-            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# Update chatbot toggle state
+def update_toggle_state():
+    if "show_chat" not in st.session_state:
+        st.session_state.show_chat = False
+
+# Call this in your main patient dashboard
+update_toggle_state()
+render_chatbot_popup()
