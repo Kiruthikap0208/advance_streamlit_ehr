@@ -64,7 +64,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-img_path = os.path.join("images", "main_bg_img.jpg")
+img_path = os.path.join("images", "images/copy-space-heart-shape-stethoscope.jpg")
 with open(img_path, "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
    

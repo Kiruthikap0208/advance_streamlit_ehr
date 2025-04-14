@@ -63,8 +63,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Background image setup
-with open("images/copy-space-heart-shape-stethoscope.jpg", "rb") as img_file:
+img_path = os.path.join("images", "images/copy-space-heart-shape-stethoscope.jpg")
+with open(img_path, "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
 st.markdown(f"""
