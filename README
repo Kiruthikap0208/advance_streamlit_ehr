@@ -11,4 +11,119 @@ I am developing an Electronic Health Record (EHR) management web app with stream
 │   ├── 3_Reset_Password.py
 │   ├── 4_Dashboard_Doctor.py
 │   ├── 5_Dashboard_Admin.py
-│   └── 6_Dashboard_Patient.py
+│   └── 6_Dashboard_Patient.pyBased on your GitHub repository [advance_streamlit_ehr](https://github.com/Kiruthikap0208/advance_streamlit_ehr), here's a comprehensive `README.md` to document your project effectively:
+
+---
+
+# SRM Electronic Health Records (EHR) System
+
+A modern, role-based Electronic Health Records (EHR) web application built with Streamlit and MySQL. This system provides dedicated portals for patients, doctors, and hospital administrators, enabling functionalities such as appointment scheduling, health report management, prescription tracking, and more.
+
+---
+
+## 🚀 Features
+
+- **Role-Based Access Control**:Separate dashboards for Admin, Doctor, and Patient roles
+- **User Authentication**:Secure login and signup processes with password reset functionality
+- **Appointment Management**:Patients can book appointments; doctors can view and manage their schedules
+- **Medical Reports**:Upload and view medical reports securely
+- **Prescription Handling**:Doctors can add prescriptions; patients can view their prescribed medications
+- **Chatbot Assistance**:Integrated chatbot to assist users with common queries
+- **Admin Controls**:Manage users, view system analytics, and oversee overall operations
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend** [Streamlit](https://streamlit.io)
+- **Backend** Pythn
+- **Database** MySL
+- **Authentication** Custom implementation using MySL
+- **Chatbot** Rule-based chatbot integrated within Streamlt
+
+---
+
+## ⚙️ Setup Instructions
+
+1. **Clone the Repository**
+
+   ```bash
+   git clone https://github.com/Kiruthikap0208/advance_streamlit_ehr.git
+   cd advance_streamlit_ehr
+   ``
+
+
+2. **Set Up the Virtual Environment**
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ``
+
+
+3. **Install Dependencies**
+
+   ```bash
+   pip install -r requirements.txt
+   ``
+
+
+4. **Configure the Database**
+
+  - Ensure MySQL is installed and runnig.
+  - Create a database named `srm_eh`.
+  - Import the schea:
+
+     ```bash
+     mysql -u root -p srm_ehr < srm_ehr_schema.sql
+     ```
+
+  - (Optional) Populate with dummy daa:
+
+     ```bash
+     mysql -u root -p srm_ehr < dummy_data.sql
+     ```
+
+5. **Run the Application**
+
+   ```bash
+   streamlit run main.py
+   ``
+
+
+---
+
+## 🖼️ Screenshos
+
+*Add relevant screenshots here to showcase different parts of your application, such as login screens, dashboards, and chatbot interactios.*
+
+---
+
+## 🧾 Database Schma
+
+The database schema includes the following tales:
+
+- `uers`
+- `appointmnts`
+- `reprts`
+- `prescriptons`
+- `departmnts
+
+*Provide an ER diagram or a brief description of each table and their relationshps.*
+
+---
+
+## 👩‍💻 Author
+
+- **Nme**: Kiruhika P
+- **Gitub**: [@Kiruthikap0208](https://github.com/Kiruthikp0208)
+
+---
+
+## 📄 Lcense
+
+*Specify the license under which the project is distributed, f any.*
+
+---
+
+Feel free to customize this `README.md` further by adding more details, images, or sections as needed. Let me know if you need assistance with any specific part! 
