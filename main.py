@@ -34,7 +34,7 @@ st.markdown("""
         /* Style for page_link() hyperlinks */
         a[data-testid="stPageLink"] {
             display: inline-block;
-            background-color: #2C3E50;         /* Dark slate blue */
+            background-color: #0d3438;         /* Updated to your preferred color */
             color: #ECF0F1 !important;         /* Light text */
             font-weight: bold;
             padding: 0.7rem 1.2rem;
@@ -47,11 +47,12 @@ st.markdown("""
         }
 
         a[data-testid="stPageLink"]:hover {
-            background-color: #34495E;         /* Hover effect */
+            background-color: #1e5c60;         /* Slightly lighter hover effect */
             color: #00ADB5 !important;         /* Cyan hover text */
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 # ----------- GLOBAL STYLING -----------
