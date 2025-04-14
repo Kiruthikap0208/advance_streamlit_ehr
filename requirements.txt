@@ -1,6 +1,6 @@
 streamlit==1.24.0
 openai
-rich<14.0
+rich==13.3.5
 streamlit-option-menu
 mysql-connector-python
 streamlit-extras
