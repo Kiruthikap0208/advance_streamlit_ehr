@@ -1,7 +1,6 @@
 import streamlit as st
 import base64
 import mysql.connector
-from streamlit_extras.switch_page_button import switch_page
 
 # ----------- DB CONNECTION -----------
 def create_connection():
@@ -76,17 +75,11 @@ page_styles = f"""
 st.markdown(page_styles, unsafe_allow_html=True)
 
 # ----------- MAIN CONTENT -----------
-
 st.markdown("## 🩺 SRM Electronic Health Records")
 st.markdown("### Choose your login portal")
 
-if st.button("👨‍⚕️ Doctor Portal"):
-    switch_page("login doctor")  # Page title, not file path
-
-if st.button("🧑‍💼 Admin / Receptionist Portal"):
-    switch_page("login admin")
-
-if st.button("🧑‍🦽 Patient Portal"):
-    switch_page("login patient")
+st.page_link("pages/login_doctor.py", label="👨‍⚕️ Doctor Portal", icon="🧑‍⚕️")
+st.page_link("pages/login_admin.py", label="🧑‍💼 Admin / Receptionist Portal", icon="📋")
+st.page_link("pages/login_patient.py", label="🧑‍🦽 Patient Portal", icon="🩺")
 
 st.markdown('</div></div>', unsafe_allow_html=True)
