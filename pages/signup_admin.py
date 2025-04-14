@@ -51,6 +51,36 @@ def register_admin(name, email, password):
 
 st.set_page_config(page_title="signup admin", layout="wide")
 
+# Place this at the top of your Streamlit script
+st.markdown("""
+    <style>
+        .custom-top-left {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+        }
+        .custom-top-left button {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: black;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: 0.3s ease-in-out;
+        }
+        .custom-top-left button:hover {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+        }
+    </style>
+
+    <div class="custom-top-left">
+        <form action="/" method="get">
+            <button type="submit">🔙 Back to Main</button>
+        </form>
+    </div>
+""", unsafe_allow_html=True)
+
 # Hide sidebar and header/footer
 st.markdown("""
     <style>
@@ -114,7 +144,6 @@ with col3:
         else:
             register_admin(name, email, password)
             st.success("\u2705 Account created successfully!")
-            switch_page("login admin")
             if st.button("🔐 Go to Login Page"):
                 switch_page("login patient")
 
