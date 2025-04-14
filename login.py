@@ -39,7 +39,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Load background image
-with open(r"C:\Users\Kiruthika\Documents\advance_streamlit_ehr\copy-space-heart-shape-stethoscope.jpg", "rb") as img_file:
+with open(r"Kiruthikap0208/advance_streamlit_ehr/images/copy-space-heart-shape-stethoscope.jpg", "rb") as img_file:
     b64_img = base64.b64encode(img_file.read()).decode()
 
 # ----------- STYLING -----------
