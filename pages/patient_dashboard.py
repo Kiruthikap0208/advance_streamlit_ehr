@@ -1,4 +1,5 @@
 import streamlit as st
+st.set_page_config(page_title="Patient Dashboard", layout="wide")
 import mysql.connector
 from datetime import datetime, timedelta, date
 from streamlit_option_menu import option_menu
@@ -24,9 +25,6 @@ def create_connection():
         port=st.secrets["mysql"]["port"],
         auth_plugin='mysql_native_password'
     )
-
-
-st.set_page_config(page_title="Patient Dashboard", layout="wide")
 
 st.markdown("""
     <style>
@@ -102,6 +100,9 @@ with st.sidebar:
 st.title("👤 Patient Dashboard")
 
 user_id = st.session_state.get("user_id")
+if not user_id:
+    st.error("Unauthorized access. Please log in first.")
+    st.stop()
 conn = create_connection()
 cursor = conn.cursor()
 
@@ -165,12 +166,12 @@ elif selected == "Book Appointment":
 
         # Step 5: Submit appointment
         if st.button("📅 Book Appointment"):
-            appointment_datetime = datetime.combine(appt_date, appt_time)
+            appointment_time = datetime.combine(appt_date, appt_time)
             cursor.execute("""
                 INSERT INTO appointments 
                 (patient_id, doctor_id, appointment_time, notes, dept_name, building, room_no)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """, (user_id, selected_doc_id, appointment_datetime, notes, selected_dept, building, room))
+            """, (user_id, selected_doc_id, appointment_time, notes, selected_dept, building, room))
             conn.commit()
             st.success("✅ Appointment booked successfully!")
 
@@ -249,6 +250,6 @@ elif selected == "Profile & Settings":
 
 
 if "user_id" in st.session_state and st.session_state.get("role") == "patient":
-    render_chatbot()
+    render_chatbot_popup()
 
 conn.close()
