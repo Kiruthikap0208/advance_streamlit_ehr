@@ -242,103 +242,65 @@ elif selected == "Profile & Settings":
 
 
 
-import streamlit.components.v1 as components
+from streamlit_chat import message
+import streamlit as st
 
-components.html("""
-<style>
-#chat-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #4A90E2;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 10px 16px;
-  font-size: 15px;
-  cursor: pointer;
-  z-index: 10000 !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-#chat-popup {
-  position: fixed;
-  bottom: 70px;
-  right: 20px;
-  width: 300px;
-  height: 400px;
-  background-color: #fff;
-  border-radius: 10px;
-  display: none;
-  flex-direction: column;
-  padding: 10px;
-  z-index: 10000 !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
+# Add a fixed position button using CSS
+with st.container():
+    st.markdown("""
+        <style>
+        .chat-button {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 10000;
+        }
+        </style>
+        <script>
+            const chatArea = window.parent.document.querySelector("section.main");
+            if (chatArea) {
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+        </script>
+    """, unsafe_allow_html=True)
 
-#chat-log {
-  flex-grow: 1;
-  overflow-y: auto;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #333;
-  max-height: 300px;
-}
+    chat_toggle = st.button("💬 Chat with Assistant", key="chat_button")
 
-#chat-input {
-  width: 100%;
-  height: 50px;
-  border-radius: 8px;
-  resize: none;
-  padding: 8px;
-  font-size: 13px;
-}
-</style>
+if chat_toggle or st.session_state.get("chat_open", False):
+    st.session_state.chat_open = True
+    with st.expander("🤖 Need help? Ask me anything!", expanded=True):
+        for i, (msg, is_user) in enumerate(st.session_state.messages):
+            message(msg, is_user=is_user, key=f"msg_{i}")
 
-<button id="chat-button">💬 Chat</button>
+        user_input = st.text_input("Your message", key="user_input")
+        if user_input:
+            st.session_state.messages.append((user_input, True))
 
-<div id="chat-popup">
-  <div id="chat-log">Hi 👋 Need help with appointments, reports, or more?<br><br></div>
-  <textarea id="chat-input" placeholder="Type your message..."></textarea>
-</div>
+            # Simple keyword response
+            response = "🤖 I didn't understand that. Try 'book appointment' or 'my reports'."
+            if "appointment" in user_input.lower():
+                response = "📅 You can book or view appointments from the sidebar."
+            elif "report" in user_input.lower():
+                response = "📝 Check or upload your reports in the Reports tab."
+            elif "prescription" in user_input.lower():
+                response = "💊 Your prescriptions are in the Prescriptions tab."
+            elif "profile" in user_input.lower():
+                response = "👤 You can update your profile info in the Profile & Settings section."
+            elif "contact" in user_input.lower():
+                response = "📞 You can reach us at support@healthapp.com"
 
-<script>
-const btn = document.getElementById("chat-button");
-const popup = document.getElementById("chat-popup");
-const input = document.getElementById("chat-input");
-const log = document.getElementById("chat-log");
-
-btn.onclick = () => {
-  popup.style.display = popup.style.display === "flex" ? "none" : "flex";
-};
-
-input.addEventListener("keydown", function(e) {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    const userMsg = input.value.trim();
-    if (userMsg) {
-      log.innerHTML += `<div><b>You:</b> ${userMsg}</div>`;
-      let botReply = "🤖 I didn't get that.";
-      const msg = userMsg.toLowerCase();
-
-      if (msg.includes("appointment")) {
-        botReply = "📅 Go to Book Appointment or Appointments tab in the sidebar.";
-      } else if (msg.includes("report")) {
-        botReply = "📝 You can view or upload reports under the Reports tab.";
-      } else if (msg.includes("contact")) {
-        botReply = "☎️ Contact us at support@hospital.com or call 1234567890.";
-      } else if (msg.includes("department")) {
-        botReply = "🏥 We have departments like Cardiology, Neurology, Pediatrics, etc.";
-      }
-
-      log.innerHTML += `<div><b>Bot:</b> ${botReply}</div><br>`;
-      input.value = "";
-      log.scrollTop = log.scrollHeight;
-    }
-  }
-});
-</script>
-""", height=0, width=0)
+            st.session_state.messages.append((response, False))
 
 
 conn.close()
