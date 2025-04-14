@@ -81,22 +81,35 @@ user_id = st.session_state.get("user_id")
 conn = create_connection()
 cursor = conn.cursor()
 
+from datetime import datetime, timedelta
+
 st.subheader("🔔 Your Appointments in Next 24 Hours")
+
+# Adjust timezone-aware datetime range if needed
+now = datetime.now()
+next_day = now + timedelta(days=1)
+
 cursor.execute("""
-    SELECT a.appointment_time, d.name AS doctor_name
+    SELECT 
+        a.appointment_time, 
+        u.name AS doctor_name, 
+        a.dept_name,
+        a.building,
+        a.room_no
     FROM appointments a
-    JOIN users d ON a.doctor_id = d.id
-    WHERE a.patient_id = %s AND a.appointment_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
+    JOIN users u ON a.doctor_id = u.id
+    WHERE a.patient_id = %s AND a.appointment_time BETWEEN %s AND %s
     ORDER BY a.appointment_time
-""", (user_id,))
+""", (user_id, now, next_day))
 
 reminders = cursor.fetchall()
 
 if reminders:
-    for appt_time, dname in reminders:
-        st.info(f"🕒 {appt_time} — with Dr. {dname}")
+    for appt_time, dname, dept, building, room in reminders:
+        st.info(f"🕒 {appt_time.strftime('%Y-%m-%d %H:%M')} — with Dr. {dname} ({dept}, {building}, Room {room})")
 else:
     st.success("No upcoming appointments.")
+
 
 if selected == "My Health Records":
     st.subheader("📋 Personal Health Info")
@@ -125,9 +138,9 @@ elif selected == "Book Appointment":
     departments = [row[0] for row in cursor.fetchall()]
     selected_dept = st.selectbox("Choose Department", departments)
 
-    # Step 2: Get doctors in that department (join via approved_doctors)
+    # Step 2: Get doctors in that department
     cursor.execute("""
-        SELECT u.id, u.name
+        SELECT u.id, u.name, ad.department, ad.building, ad.room_no
         FROM users u
         JOIN approved_doctors ad ON u.email = ad.email
         WHERE u.role = 'doctor' AND ad.department = %s
@@ -137,8 +150,22 @@ elif selected == "Book Appointment":
     if not doctor_list:
         st.warning("No doctors found in this department.")
     else:
-        doctor_map = {f"Dr. {name} ({doc_id})": doc_id for doc_id, name in doctor_list}
+        # Map doctor selection to full doctor details
+        doctor_map = {
+            f"Dr. {name} ({doc_id})": {
+                "id": doc_id,
+                "dept_name": department,
+                "building": building,
+                "room_no": room_no
+            }
+            for doc_id, name, department, building, room_no in doctor_list
+        }
+
         selected_doc_label = st.selectbox("Choose Doctor", list(doctor_map.keys()))
+        selected_doc = doctor_map[selected_doc_label]
+
+        # Optional display of building and room
+        st.markdown(f"**Building:** {selected_doc['building']} &nbsp;&nbsp;&nbsp; **Room No:** {selected_doc['room_no']}")
 
         # Step 3: Select date and time
         appt_date = st.date_input("Select Date", min_value=date.today())
@@ -148,14 +175,22 @@ elif selected == "Book Appointment":
         # Step 4: Submit appointment
         if st.button("📅 Book Appointment"):
             appointment_datetime = datetime.combine(appt_date, appt_time)
-            selected_doc_id = doctor_map[selected_doc_label]
 
             cursor.execute("""
-                INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
-                VALUES (%s, %s, %s, %s)
-            """, (user_id, selected_doc_id, appointment_datetime, notes))
+                INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes, dept_name, building, room_no)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                user_id,
+                selected_doc["id"],
+                appointment_datetime,
+                notes,
+                selected_doc["dept_name"],
+                selected_doc["building"],
+                selected_doc["room_no"]
+            ))
             conn.commit()
             st.success("✅ Appointment booked successfully!")
+
 
 
 elif selected == "Reports":
