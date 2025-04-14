@@ -241,120 +241,101 @@ elif selected == "Profile & Settings":
         st.error("Profile not found.")
 
 
-# --- Inject chatbot toggle and popup ---
-components.html("""
+
+chat_html = """
 <style>
-.chat-popup-btn {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  background-color: #4A90E2;
-  color: white;
-  padding: 12px 16px;
-  border: none;
-  border-radius: 50px;
-  font-size: 16px;
-  cursor: pointer;
-  z-index: 9999;
-  box-shadow: 2px 2px 12px rgba(0,0,0,0.3);
+#chat-toggle-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background-color: #4A90E2;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    font-weight: bold;
 }
 
-.chat-popup-box {
-  display: none;
-  position: fixed;
-  bottom: 90px;
-  right: 25px;
-  width: 320px;
-  height: 400px;
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
-  border-radius: 10px;
-  padding: 10px;
-  z-index: 9999;
-  overflow-y: auto;
+#chat-box {
+    position: fixed;
+    bottom: 80px;
+    right: 25px;
+    width: 300px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    padding: 15px;
+    display: none;
+    flex-direction: column;
+    z-index: 9999;
 }
 
-.chat-popup-box.open {
-  display: block;
+#chat-box textarea {
+    width: 100%;
+    height: 60px;
+    margin-top: auto;
+    border-radius: 10px;
+    padding: 10px;
+    resize: none;
+    font-size: 14px;
 }
 
-.chat-popup-header {
-  font-weight: bold;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 5px;
-}
-
-.chat-popup-input {
-  width: 100%;
-  padding: 6px;
-  border-radius: 5px;
-  margin-top: 10px;
-  border: none;
-}
-
-.chat-msg {
-  margin-bottom: 8px;
-  font-size: 14px;
-}
-
-.user-msg {
-  color: #00ccff;
-}
-
-.bot-msg {
-  color: #ffffff;
+#chat-box .chat-log {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: black;
 }
 </style>
 
-<button class="chat-popup-btn" onclick="document.querySelector('.chat-popup-box').classList.toggle('open')">
-  💬 Ask Assistant
-</button>
-
-<div class="chat-popup-box">
-  <div class="chat-popup-header">🤖 Hospital Assistant</div>
-  <div id="chat-box"></div>
-  <input type="text" id="user-input" class="chat-popup-input" placeholder="Type here..." onkeydown="if(event.key === 'Enter') sendMessage()" />
+<button id="chat-toggle-btn">💬 Chat</button>
+<div id="chat-box">
+    <div class="chat-log" id="chat-log">Hi there! 👋<br>Ask me about appointments, reports, or departments.</div>
+    <textarea id="chat-input" placeholder="Type your message..."></textarea>
 </div>
 
 <script>
-let chatHistory = [];
+const toggleBtn = document.getElementById("chat-toggle-btn");
+const chatBox = document.getElementById("chat-box");
+const chatInput = document.getElementById("chat-input");
+const chatLog = document.getElementById("chat-log");
 
-function sendMessage() {
-  let input = document.getElementById("user-input");
-  let msg = input.value.trim();
-  if (msg === "") return;
-  chatHistory.push(["user", msg]);
-  renderChat();
-  input.value = "";
+toggleBtn.onclick = () => {
+    chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+};
 
-  setTimeout(() => {
-    let reply = getBotReply(msg);
-    chatHistory.push(["bot", reply]);
-    renderChat();
-  }, 500);
-}
-
-function renderChat() {
-  let chatBox = document.getElementById("chat-box");
-  chatBox.innerHTML = "";
-  chatHistory.slice(-10).forEach(([sender, msg]) => {
-    let cls = sender === "user" ? "user-msg" : "bot-msg";
-    chatBox.innerHTML += `<div class="chat-msg ${cls}"><strong>${sender === 'user' ? 'You' : 'Bot'}:</strong> ${msg}</div>`;
-  });
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function getBotReply(q) {
-  q = q.toLowerCase();
-  if (q.includes("book")) return "🗓 Go to 'Book Appointment' to schedule a visit.";
-  if (q.includes("appointment")) return "📅 Check 'Appointments' tab for your scheduled visits.";
-  if (q.includes("report")) return "📂 Visit 'Reports' section to download or view reports.";
-  if (q.includes("department")) return "🏥 We offer departments like Cardiology, Neurology, and more.";
-  if (q.includes("contact")) return "📞 Call +91-XXXXXXXXXX or visit our helpdesk.";
-  return "🤖 I'm here to help! Try asking about appointments, reports, or contact.";
-}
+chatInput.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        const msg = chatInput.value.trim();
+        if (msg) {
+            chatLog.innerHTML += `<div><strong>You:</strong> ${msg}</div>`;
+            // Handle basic keyword response
+            let response = "Sorry, I didn’t understand.";
+            if (msg.toLowerCase().includes("appointment")) {
+                response = "📅 You can book or view appointments from the main menu.";
+            } else if (msg.toLowerCase().includes("report")) {
+                response = "📂 You can upload or download reports under the Reports section.";
+            } else if (msg.toLowerCase().includes("department")) {
+                response = "🏥 We have departments like Cardiology, Pediatrics, etc.";
+            } else if (msg.toLowerCase().includes("contact")) {
+                response = "📞 Please contact the hospital help desk for further assistance.";
+            }
+            chatLog.innerHTML += `<div><strong>Bot:</strong> ${response}</div>`;
+            chatInput.value = "";
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+    }
+});
 </script>
-""", height=0)
+"""
+
+components.html(chat_html, height=0, width=0)
+
 
 conn.close()
