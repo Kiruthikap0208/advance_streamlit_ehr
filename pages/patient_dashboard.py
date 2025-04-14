@@ -170,7 +170,7 @@ elif selected == "Book Appointment":
                     notes = st.text_area("Reason for Visit")
                     # Insert appointment
                     cursor.execute("""
-                        INSERT INTO appointments (patient_id, doctor_id, appointment_time, reason)
+                        INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
                         VALUES (%s, %s, %s, %s, %s)
                     """, (patient_id, doctor_id, appointment_date, appointment_time, notes))
                     conn.commit()
