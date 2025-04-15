@@ -243,7 +243,16 @@ elif selected == "Doctors":
     with st.expander("➕ Add New Doctor"):
         name = st.text_input("Doctor Name")
         email = st.text_input("Email")
-        dept = st.text_input("Department")
+
+        # Fetch departments from DB
+        cursor.execute("SELECT dept_name FROM departments")
+        dept_list = [row[0] for row in cursor.fetchall()]
+        if dept_list:
+            dept = st.selectbox("Select Department", dept_list)
+        else:
+            st.warning("⚠️ No departments found. Please add departments first.")
+            dept = None
+
         dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
         if st.button("Add Doctor"):
             new_id = generate_custom_id("d", "doctor")
