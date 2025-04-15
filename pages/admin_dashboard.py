@@ -348,6 +348,52 @@ elif selected == "Appointments":
                     conn.commit()
                     st.warning("Appointment cancelled.")
 
+elif selected == "Departments":
+    st.subheader("🏢 Manage Departments")
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    with st.expander("➕ Add New Department"):
+        dept_name = st.text_input("Department Name")
+        building = st.text_input("Building")
+        rooms = st.text_input("Room Numbers (comma-separated)")
+
+        if st.button("Add Department"):
+            cursor.execute("INSERT INTO departments (dept_name, building, rooms) VALUES (%s, %s, %s)",
+                           (dept_name, building, rooms))
+            conn.commit()
+            st.success("Department added successfully!")
+
+    st.markdown("---")
+    st.subheader("📋 All Departments")
+    cursor.execute("SELECT dept_name, building, rooms FROM departments")
+    departments = cursor.fetchall()
+
+    for dept_name, building, rooms in departments:
+        with st.expander(f"{dept_name}"):
+            new_name = st.text_input(f"Edit Name - {dept_name}", value=dept_name, key=f"name_{dept_name}")
+            new_building = st.text_input(f"Edit Building - {dept_name}", value=building, key=f"bldg_{dept_name}")
+            new_rooms = st.text_input(f"Edit Rooms - {dept_name}", value=rooms, key=f"room_{dept_name}")
+
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button(f"Update {dept_name}"):
+                    cursor.execute("""
+                        UPDATE departments SET dept_name=%s, building=%s, rooms=%s
+                        WHERE dept_name=%s
+                    """, (new_name, new_building, new_rooms, dept_name))
+                    conn.commit()
+                    st.success("Department updated successfully!")
+
+            with col2:
+                if st.button(f"Delete {dept_name}"):
+                    cursor.execute("DELETE FROM departments WHERE dept_name=%s", (dept_name,))
+                    conn.commit()
+                    st.warning("Department deleted successfully!")
+
+    conn.close()
+
+
 elif selected == "Reports":
     st.subheader("📄 Upload/View Reports")
     os.makedirs("reports", exist_ok=True)
