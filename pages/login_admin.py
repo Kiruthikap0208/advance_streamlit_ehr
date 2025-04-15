@@ -111,7 +111,7 @@ with col3:
             st.success("Login successful!")
             st.session_state.logged_in = True
             st.session_state.user_email = email
-            st.page_link("pages/login_dashboard.py", label="Go to Dashboard")  # Keep this since page_link is for buttons, not programmatic flow
+            st.page_link("pages/admin_dashboard.py", label="Go to Dashboard")  # Keep this since page_link is for buttons, not programmatic flow
         else:
             st.error("Invalid credentials or not an admin.")
 
