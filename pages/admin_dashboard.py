@@ -294,39 +294,46 @@ elif selected == "Doctors":
 
 elif selected == "Appointments":
     st.subheader("📅 Book New Appointment")
+
     cursor.execute("SELECT id, name FROM users WHERE role='patient'")
     patients = cursor.fetchall()
     patient_options = {f"{name} ({pid})": pid for pid, name in patients}
 
+    # Select patient
+    selected_patient = st.selectbox("Select Patient", list(patient_options.keys()))
+
+    # Select department
     cursor.execute("SELECT dept_name FROM departments")
     department_list = [d[0] for d in cursor.fetchall()]
+    selected_department = st.selectbox("Select Department", department_list)
 
-    cursor.execute("SELECT id, name, email FROM users WHERE role='doctor'")
-    doctor_map = cursor.fetchall()
+    # Filter doctors based on department
+    cursor.execute("""
+        SELECT u.id, u.name
+        FROM users u
+        JOIN approved_doctors ad ON u.email = ad.email
+        WHERE ad.department = %s
+    """, (selected_department,))
+    filtered_doctors = cursor.fetchall()
+    doctor_options = {f"{name} ({doc_id})": doc_id for doc_id, name in filtered_doctors}
 
-    with st.form("appointment_form"):
-        selected_patient = st.selectbox("Select Patient", list(patient_options.keys()))
-        selected_department = st.selectbox("Select Department", department_list)
+    # Select doctor
+    selected_doctor = st.selectbox("Select Doctor", list(doctor_options.keys()) if doctor_options else ["No doctors available"])
+    
+    # Date and time input
+    appointment_date = st.date_input("Appointment Date")
+    appointment_time = st.time_input("Appointment Time")
+    notes = st.text_area("Notes")
 
-        cursor.execute("SELECT email FROM approved_doctors WHERE department = %s", (selected_department,))
-        approved_emails = [row[0] for row in cursor.fetchall()]
-
-        filtered_doctors = [
-            (doc_id, doc_name) for doc_id, doc_name, doc_email in doctor_map if doc_email in approved_emails
-        ]
-        doctor_options = {f"{name} ({did})": did for did, name in filtered_doctors}
-
-        selected_doctor = st.selectbox("Select Doctor", list(doctor_options.keys()))
-        appointment_date = st.date_input("Appointment Date")
-        appointment_time = st.time_input("Appointment Time")
-        notes = st.text_area("Notes")
-        submit_appt = st.form_submit_button("Book Appointment")
-
-        if submit_appt:
-            datetime_combined = f"{appointment_date} {appointment_time}"
-            cursor.execute("INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes) VALUES (%s, %s, %s, %s)", (patient_options[selected_patient], doctor_options[selected_doctor], datetime_combined, notes))
-            conn.commit()
-            st.success("✅ Appointment booked successfully!")
+    submit_appt = st.button("Book Appointment")
+    if submit_appt and doctor_options:
+        datetime_combined = f"{appointment_date} {appointment_time}"
+        cursor.execute("""
+            INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
+            VALUES (%s, %s, %s, %s)
+        """, (patient_options[selected_patient], doctor_options[selected_doctor], datetime_combined, notes))
+        conn.commit()
+        st.success("✅ Appointment booked successfully!")
 
     st.markdown("---")
     st.subheader("📋 All Appointments")
