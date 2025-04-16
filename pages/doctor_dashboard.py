@@ -98,22 +98,7 @@ user_id = st.session_state.get("user_id")
 conn = create_connection()
 cursor = conn.cursor()
 
-st.subheader("🔔 Your Appointments in Next 24 Hours")
-cursor.execute("""
-    SELECT a.appointment_time, p.name AS patient_name
-    FROM appointments a
-    JOIN users p ON a.patient_id = p.id
-    WHERE a.doctor_id = %s AND a.appointment_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
-    ORDER BY a.appointment_time
-""", (user_id,))
 
-reminders = cursor.fetchall()
-
-if reminders:
-    for appt_time, pname in reminders:
-        st.info(f"🕒 {appt_time} — with {pname}")
-else:
-    st.success("No upcoming appointments.")
 
 if selected == "Calendar":
     st.subheader("📅 Appointments Calendar")
@@ -233,30 +218,44 @@ elif selected == "Diagnoses":
 elif selected == "Reports":
     st.subheader("📂 Upload/View Reports")
     os.makedirs("reports", exist_ok=True)
+
+    # Dropdown for selecting patient
+    cursor.execute("SELECT id, name FROM users WHERE role = 'patient'")
+    patients = cursor.fetchall()
+    patient_map = {f"{name} ({pid})": pid for pid, name in patients}
+    selected_patient = st.selectbox("Select Patient", list(patient_map.keys()), key="report_patient_dropdown")
+
     uploaded = st.file_uploader("Upload Report", type=["pdf", "jpg", "png"], key="doctor_report")
-    patient_id = st.text_input("Patient ID")
-    doctor_id = st.text_input("Your Doctor ID")
-    if st.button("Upload Report") and uploaded and patient_id and doctor_id:
+
+    doctor_id = user_id  # Use session-based doctor ID
+
+    if st.button("Upload Report") and uploaded and selected_patient:
+        patient_id = patient_map[selected_patient]
         file_path = f"reports/{uploaded.name}"
         with open(file_path, "wb") as f:
             f.write(uploaded.getvalue())
-        cursor.execute("INSERT INTO reports (patient_id, file_path, uploaded_by, uploaded_at) VALUES (%s, %s, %s, NOW())",
-                       (patient_id, file_path, doctor_id))
+        cursor.execute(
+            "INSERT INTO reports (patient_id, file_path, uploaded_by, uploaded_at) VALUES (%s, %s, %s, NOW())",
+            (patient_id, file_path, doctor_id)
+        )
         conn.commit()
         st.success("Report uploaded successfully!")
 
+    # View uploaded reports by this doctor
     st.markdown("---")
-    if doctor_id:
-        cursor.execute("SELECT patient_id, file_path, uploaded_at FROM reports WHERE uploaded_by = %s", (doctor_id,))
-        reports = cursor.fetchall()
-        for pid, path, uploaded_at in reports:
-            with st.expander(f"Report for {pid} - {uploaded_at}"):
-                try:
-                    with open(path, "rb") as f:
-                        file_bytes = f.read()
-                    st.download_button("Download", data=file_bytes, file_name=os.path.basename(path))
-                except:
-                    st.error("File not found")
+    st.subheader("📁 My Uploaded Reports")
+
+    cursor.execute("SELECT patient_id, file_path, uploaded_at FROM reports WHERE uploaded_by = %s", (doctor_id,))
+    reports = cursor.fetchall()
+    for pid, path, uploaded_at in reports:
+        with st.expander(f"Report for Patient {pid} - {uploaded_at}"):
+            try:
+                with open(path, "rb") as f:
+                    file_bytes = f.read()
+                st.download_button("Download", data=file_bytes, file_name=os.path.basename(path))
+            except:
+                st.error("File not found.")
+
 
 elif selected == "Prescriptions":
     st.subheader("💊 Manage Prescriptions")
