@@ -1,24 +1,29 @@
 import streamlit as st
 
 def render_chatbot():
-    # Rule-based chatbot logic
+    # Improved FAQ response mapping
     faq_responses = {
-        "book appointment": "To book an appointment, go to the 'Book Appointment' tab in the sidebar.",
-        "appointments": "To view your upcoming and past appointments, check the 'Appointments' tab.",
-        "reports": "Medical reports can be viewed or downloaded in the 'Reports' tab.",
-        "prescriptions": "Check your medications and instructions in the 'Prescriptions' section.",
-        "profile": "To edit your personal details, visit 'Profile & Settings'.",
-        "support": "For help, please email our support at support@ehrhospital.com."
+        "book appointment": "To book an appointment, go to the 'Book Appointment' section in the sidebar.",
+        "reschedule": "Currently, rescheduling isn't supported. Please cancel and rebook.",
+        "appointments": "To view your appointments, click on the 'Appointments' tab.",
+        "reports": "Click on 'Reports' in the sidebar to see your medical reports.",
+        "profile": "Go to 'Profile & Settings' to update your information.",
+        "departments": "We offer Cardiology, Neurology, Pediatrics, Dermatology and more.",
+        "dermatology": "Please use the 'Book Appointment' tab and select Dermatology from the department list.",
+        "upload report": "Use the 'Reports' tab and click on Upload.",
+        "support": "Support is available via email at support@ehrhospital.com.",
+        "emergency": "Please dial 108 or visit the nearest emergency ward.",
+        "contact": "You can reach us via support@ehrhospital.com"
     }
 
-    def match_faq(user_input):
+    def get_response(user_input):
         user_input = user_input.lower()
         for keyword, response in faq_responses.items():
             if keyword in user_input:
                 return response
-        return "I'm sorry, I couldn't understand that. Please try asking differently."
+        return "🤖 I'm sorry, I couldn't understand that. Please try asking differently."
 
-    # Modern chatbot UI styling
+    # UI Styling
     st.markdown("""
     <style>
     .chat-container {
@@ -45,30 +50,13 @@ def render_chatbot():
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("**🤖 Bot:** Hi there! Welcome to SRM EHR Patient Portal. How may I assist you today?")
+    st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
+    st.markdown("**🤖 Bot:** Hi there! I’m your assistant. Ask me anything related to your dashboard!")
 
-    user_choice = st.radio("Choose an option:", [
-        "📅 View My Appointments",
-        "📝 Book Appointment",
-        "📂 View My Medical Reports",
-        "☎️ Contact Support"
-    ])
-
-    if user_choice == "📅 View My Appointments":
-        st.markdown("**🤖 Bot:** To view your appointments, go to the 'Appointments' tab in the sidebar.")
-
-    elif user_choice == "📝 Book Appointment":
-        department = st.selectbox("Select Department", ["General", "Cardiology", "Dermatology", "Orthopedics"])
-        preferred_date = st.date_input("Choose a date")
-        preferred_time = st.time_input("Choose a time")
-        if st.button("Submit Booking Request"):
-            st.success(f"✅ Your appointment request for {department} on {preferred_date} at {preferred_time} has been noted!")
-
-    elif user_choice == "📂 View My Medical Reports":
-        st.markdown("**🤖 Bot:** You can view your medical reports in the 'Reports' tab of the dashboard.")
-
-    elif user_choice == "☎️ Contact Support":
-        st.markdown("**🤖 Bot:** You can reach us at:")
-        st.info("📧 support@srm-ehr.com\n📞 +91-9876543210")
+    user_input = st.text_input("You:", key="chat_input")
+    if user_input:
+        response = get_response(user_input)
+        st.markdown(f"**🧑 You:** {user_input}")
+        st.markdown(f"**🤖 Bot:** {response}")
 
     st.markdown("</div>", unsafe_allow_html=True)
