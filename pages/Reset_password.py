@@ -98,7 +98,7 @@ with col3:
                 update_password(st.session_state.verified_email, new_password)
                 st.session_state.password_updated = True
                 st.success("✅ Password updated successfully!")
-                st.page_link("main.py", label="🔐 Back to Login", icon="🔒")
+                st.page_link("main.py", label=" Back to Login", icon="🔒")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
