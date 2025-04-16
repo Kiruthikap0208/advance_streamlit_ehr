@@ -270,19 +270,20 @@ elif selected == "Prescriptions":
     diagnosis = st.text_area("Diagnosis")
     medicine = st.text_input("Medicine Name")
     dosage = st.text_input("Dosage Instructions")
+    instructions = st.text_area("Other Instructions")
 
     doctor_id = user_id  # from session
     patient_id = patient_map[selected_patient]
 
     if st.button("Save Prescription"):
         if not medicine.strip() or not dosage.strip():
-            st.warning("Please enter both medicine and dosage.")
+            st.warning("Please enter both medicine and dosage details.")
         else:
             # Save to prescriptions table
             cursor.execute("""
-                INSERT INTO prescriptions (patient_id, doctor_id, medicine, dosage, date_issued)
-                VALUES (%s, %s, %s, %s, NOW())
-            """, (patient_id, doctor_id, medicine, dosage))
+                INSERT INTO prescriptions (patient_id, doctor_id, medicine, dosage, instructions, date_issued)
+                VALUES (%s, %s, %s, %s, %s, NOW())
+            """, (patient_id, doctor_id, medicine, dosage, instructions))
 
             # Update patients table
             cursor.execute("SELECT id FROM patients WHERE id = %s", (patient_id,))
