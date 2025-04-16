@@ -266,24 +266,40 @@ elif selected == "Prescriptions":
     patient_map = {f"{name} ({pid})": pid for pid, name in patients}
 
     selected_patient = st.selectbox("Choose Patient", list(patient_map.keys()), key="prescription_patient")
+    symptoms = st.text_area("Symptoms")
+    diagnosis = st.text_area("Diagnosis")
     prescription_text = st.text_area("Enter Prescription")
 
-    doctor_id = user_id  # Automatically from session
+    doctor_id = user_id  # from session
+    patient_id = patient_map[selected_patient]
 
     if st.button("Save Prescription"):
         if not prescription_text.strip():
             st.warning("Please enter the prescription.")
         else:
-            file_path = f"reports/prescription_{patient_map[selected_patient]}.txt"
-            with open(file_path, "w") as f:
-                f.write(prescription_text)
-
+            # Save prescription to prescriptions table
             cursor.execute("""
-                INSERT INTO reports (patient_id, file_path, uploaded_by, uploaded_at)
-                VALUES (%s, %s, %s, NOW())
-            """, (patient_map[selected_patient], file_path, doctor_id))
+                INSERT INTO prescriptions (patient_id, doctor_id, medicine, dosage, instructions, date_issued)
+                VALUES (%s, %s, %s, %s, %s, NOW())
+            """, (patient_id, doctor_id, prescription_text, "-", "Follow as instructed"))
+
+            # Update patients table
+            cursor.execute("SELECT id FROM patients WHERE id = %s", (patient_id,))
+            exists = cursor.fetchone()
+            if exists:
+                cursor.execute("""
+                    UPDATE patients
+                    SET symptoms = %s, diagnosis = %s, created_by = %s
+                    WHERE id = %s
+                """, (symptoms, diagnosis, doctor_id, patient_id))
+            else:
+                cursor.execute("""
+                    INSERT INTO patients (id, name, symptoms, diagnosis, created_by)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (patient_id, selected_patient.split(" (")[0], symptoms, diagnosis, doctor_id))
+
             conn.commit()
-            st.success("✅ Prescription saved and uploaded as report.")
+            st.success("✅ Prescription saved and patient record updated.")
 
 
 elif selected == "Profile & Settings":
