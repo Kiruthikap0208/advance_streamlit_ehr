@@ -222,7 +222,7 @@ elif selected == "Appointments":
                         <strong>Doctor:</strong> {doctor_name} ({department})<br>
                         <strong>Date & Time:</strong> {appt_time.strftime("%Y-%m-%d %H:%M")}<br>
                         <strong>Building:</strong> {building or 'N/A'}<br>
-                        <strong>Room:</strong> {room or 'N/A'}<br>
+                        <strong>Floor:</strong> {room or 'N/A'}<br>
                         <strong>Notes:</strong> {notes or '—'}
                     </div>
                 """, unsafe_allow_html=True)
