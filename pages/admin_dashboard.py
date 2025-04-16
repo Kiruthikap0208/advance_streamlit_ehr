@@ -295,43 +295,54 @@ elif selected == "Doctors":
 elif selected == "Appointments":
     st.subheader("📅 Book New Appointment")
 
+    # Fetch patients
     cursor.execute("SELECT id, name FROM users WHERE role='patient'")
     patients = cursor.fetchall()
     patient_options = {f"{name} ({pid})": pid for pid, name in patients}
-
-    # Select patient
     selected_patient = st.selectbox("Select Patient", list(patient_options.keys()))
 
-    # Select department
+    # Fetch departments
     cursor.execute("SELECT dept_name FROM departments")
-    department_list = [d[0] for d in cursor.fetchall()]
-    selected_department = st.selectbox("Select Department", department_list)
+    departments = [row[0] for row in cursor.fetchall()]
+    selected_department = st.selectbox("Select Department", departments)
 
-    # Filter doctors based on department
+    # Filter doctors by selected department
     cursor.execute("""
-        SELECT u.id, u.name
+        SELECT u.id, u.name, u.email
         FROM users u
         JOIN approved_doctors ad ON u.email = ad.email
-        WHERE ad.department = %s
+        WHERE u.role = 'doctor' AND ad.department = %s
     """, (selected_department,))
-    filtered_doctors = cursor.fetchall()
-    doctor_options = {f"{name} ({doc_id})": doc_id for doc_id, name in filtered_doctors}
+    doctors = cursor.fetchall()
 
-    # Select doctor
-    selected_doctor = st.selectbox("Select Doctor", list(doctor_options.keys()) if doctor_options else ["No doctors available"])
-    
-    # Date and time input
+    doctor_options = {f"Dr. {name} ({doc_id})": (doc_id, email) for doc_id, name, email in doctors}
+    selected_doctor_label = st.selectbox("Select Doctor", list(doctor_options.keys()) if doctor_options else ["No doctors available"])
+    selected_doc_id, selected_doc_email = doctor_options.get(selected_doctor_label, (None, None))
+
+    # Get building and room from department
+    cursor.execute("SELECT building, rooms FROM departments WHERE dept_name = %s", (selected_department,))
+    dept_info = cursor.fetchone()
+    building, room = dept_info if dept_info else ("N/A", "N/A")
+
+    # Appointment details
     appointment_date = st.date_input("Appointment Date")
     appointment_time = st.time_input("Appointment Time")
     notes = st.text_area("Notes")
 
-    submit_appt = st.button("Book Appointment")
-    if submit_appt and doctor_options:
-        datetime_combined = f"{appointment_date} {appointment_time}"
+    if st.button("📅 Book Appointment") and selected_doc_id:
+        appointment_datetime = f"{appointment_date} {appointment_time}"
         cursor.execute("""
-            INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes)
-            VALUES (%s, %s, %s, %s)
-        """, (patient_options[selected_patient], doctor_options[selected_doctor], datetime_combined, notes))
+            INSERT INTO appointments (patient_id, doctor_id, appointment_time, notes, dept_name, building, room_no)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (
+            patient_options[selected_patient],
+            selected_doc_id,
+            appointment_datetime,
+            notes,
+            selected_department,
+            building,
+            room
+        ))
         conn.commit()
         st.success("✅ Appointment booked successfully!")
 
@@ -343,8 +354,8 @@ elif selected == "Appointments":
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
     """)
-
     appointments = cursor.fetchall()
+
     for aid, pname, dname, time, notes in appointments:
         with st.expander(f"{pname} with {dname} at {time}"):
             st.write("📝 Notes:", notes)
@@ -363,6 +374,7 @@ elif selected == "Appointments":
                     cursor.execute("DELETE FROM appointments WHERE id = %s", (aid,))
                     conn.commit()
                     st.warning("Appointment cancelled.")
+
 
 elif selected == "Departments":
     st.subheader("🏢 Manage Departments")
