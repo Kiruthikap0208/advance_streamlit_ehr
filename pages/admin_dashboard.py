@@ -197,17 +197,35 @@ elif selected == "Patients":
     cursor = conn.cursor()
 
     with st.expander("➕ Add New Patient"):
-        name = st.text_input("Full Name")
-        email = st.text_input("Email")
-        dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
-        if st.button("Add Patient"):
-            new_id = generate_custom_id("p", "patient")
-            cursor.execute("INSERT INTO users (id, name, email, dob, role) VALUES (%s, %s, %s, %s, 'patient')",
-                        (new_id, name, email, dob))
-            cursor.execute("INSERT INTO approved_patients (name, dob, email) VALUES (%s, %s, %s)",
-                        (name, dob, email))
-            conn.commit()
-            st.success("Patient added successfully!")
+    name = st.text_input("Full Name")
+    email = st.text_input("Email")
+    dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
+    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+    
+    if st.button("Add Patient"):
+        new_id = generate_custom_id("p", "patient")
+        age = datetime.now().year - dob.year
+
+        # Insert into users
+        cursor.execute("""
+            INSERT INTO users (id, name, email, dob, role)
+            VALUES (%s, %s, %s, %s, 'patient')
+        """, (new_id, name, email, dob))
+
+        # Insert into approved_patients
+        cursor.execute("""
+            INSERT INTO approved_patients (name, dob, email)
+            VALUES (%s, %s, %s)
+        """, (name, dob, email))
+
+        # Insert into patients table with dob, age, gender
+        cursor.execute("""
+            INSERT INTO patients (id, name, dob, age, gender)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (new_id, name, dob, age, gender))
+
+        conn.commit()
+        st.success("✅ Patient added successfully!")
 
 
     st.markdown("---")
@@ -243,25 +261,33 @@ elif selected == "Doctors":
     with st.expander("➕ Add New Doctor"):
         name = st.text_input("Doctor Name")
         email = st.text_input("Email")
-
-        # Fetch departments from DB
-        cursor.execute("SELECT dept_name FROM departments")
-        dept_list = [row[0] for row in cursor.fetchall()]
-        if dept_list:
-            dept = st.selectbox("Select Department", dept_list)
-        else:
-            st.warning("⚠️ No departments found. Please add departments first.")
-            dept = None
-
         dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
+
+        # Fetch department list and show as dropdown
+        cursor.execute("SELECT dept_name, id FROM departments")
+        department_records = cursor.fetchall()
+        department_options = {f"{name} (ID: {did})": (name, did) for name, did in department_records}
+        selected_dept = st.selectbox("Select Department", list(department_options.keys()))
+        dept_name, dept_id = department_options[selected_dept]
+
         if st.button("Add Doctor"):
             new_id = generate_custom_id("d", "doctor")
-            cursor.execute("INSERT INTO users (id, name, email, role, dob) VALUES (%s, %s, %s, 'doctor', %s)",
-                           (new_id, name, email, dob))
-            cursor.execute("INSERT INTO approved_doctors (name, dob, department, email) VALUES (%s, %s, %s, %s)",
-                           (name, dob, dept, email))
+
+            # Insert into users
+            cursor.execute("""
+                INSERT INTO users (id, name, email, role, dob)
+                VALUES (%s, %s, %s, 'doctor', %s)
+            """, (new_id, name, email, dob))
+
+            # Insert into approved_doctors with dept_name and dept_id
+            cursor.execute("""
+                INSERT INTO approved_doctors (id, name, dob, department, dept_id, email)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (new_id, name, dob, dept_name, dept_id, email))
+
             conn.commit()
-            st.success("Doctor added successfully!")
+            st.success("✅ Doctor added successfully!")
+
 
     st.markdown("---")
     st.subheader("📋 All Doctors")
