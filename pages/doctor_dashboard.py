@@ -259,20 +259,32 @@ elif selected == "Reports":
 
 elif selected == "Prescriptions":
     st.subheader("💊 Manage Prescriptions")
+
+    # Fetch patients
     cursor.execute("SELECT id, name FROM users WHERE role = 'patient'")
     patients = cursor.fetchall()
     patient_map = {f"{name} ({pid})": pid for pid, name in patients}
+
     selected_patient = st.selectbox("Choose Patient", list(patient_map.keys()), key="prescription_patient")
     prescription_text = st.text_area("Enter Prescription")
-    doctor_id = st.text_input("Your Doctor ID", key="prescription_doc")
+
+    doctor_id = user_id  # Automatically from session
+
     if st.button("Save Prescription"):
-        file_path = f"reports/prescription_{patient_map[selected_patient]}.txt"
-        with open(file_path, "w") as f:
-            f.write(prescription_text)
-        cursor.execute("INSERT INTO reports (patient_id, file_path, uploaded_by, uploaded_at) VALUES (%s, %s, %s, NOW())",
-                       (patient_map[selected_patient], file_path, doctor_id))
-        conn.commit()
-        st.success("Prescription saved as report!")
+        if not prescription_text.strip():
+            st.warning("Please enter the prescription.")
+        else:
+            file_path = f"reports/prescription_{patient_map[selected_patient]}.txt"
+            with open(file_path, "w") as f:
+                f.write(prescription_text)
+
+            cursor.execute("""
+                INSERT INTO reports (patient_id, file_path, uploaded_by, uploaded_at)
+                VALUES (%s, %s, %s, NOW())
+            """, (patient_map[selected_patient], file_path, doctor_id))
+            conn.commit()
+            st.success("✅ Prescription saved and uploaded as report.")
+
 
 elif selected == "Profile & Settings":
     st.subheader("⚙️ Profile & Settings")
