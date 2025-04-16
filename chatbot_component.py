@@ -3,65 +3,118 @@ import streamlit as st
 def render_chatbot():
     # Improved FAQ response mapping
     faq_responses = {
-        # ✅ Appointments
-        "how do i book an appointment": "Go to the 'Book Appointment' section in the sidebar.",
-        "can i reschedule my appointment": "Currently, rescheduling isn't supported. Please cancel and rebook.",
-        "can i cancel my appointment": "Yes. Use the 'Appointments' tab to cancel any existing appointment.",
-        "how can i view my appointment": "Click on the 'Appointments' tab to see all your bookings.",
-        "can i choose a specific doctor": "Yes, use the 'Book Appointment' tab to select a department and doctor.",
-        "what if no doctor is available": "Please try a different time or department. Some slots may be full.",
-        "can i add notes to appointments": "Yes, you can add a reason or notes when booking an appointment.",
-        "how long are appointment slots": "Each appointment typically lasts around 30 minutes.",
+        # Appointments
+        "book appointment": "To book an appointment, go to the 'Book Appointment' tab in the sidebar.",
+        "reschedule": "Currently, rescheduling isn't supported. Please cancel and rebook.",
+        "cancel appointment": "To cancel an appointment, navigate to the 'Appointments' tab.",
+        "appointment time": "Your upcoming appointments are listed in the 'Appointments' tab.",
+        "doctor schedule": "Doctor availability is visible in the 'Book Appointment' section.",
+        
+        # Reports
+        "upload report": "Use the 'Reports' tab and click on Upload to submit your medical reports.",
+        "view reports": "You can view and download reports in the 'Reports' tab.",
+        "download report": "Go to the 'Reports' tab and use the download button next to each file.",
+        "report status": "Reports are uploaded manually and stored securely in your dashboard.",
+        
+        # Prescriptions
+        "view prescriptions": "Navigate to the 'Prescriptions' tab to view your medications.",
+        "medication details": "Prescription details like dosage and instructions are shown in 'Prescriptions'.",
+        "old prescriptions": "Your historical prescriptions are also listed under the 'Prescriptions' tab.",
+        
+        # Navigation
+        "where is": "All sections can be accessed via the sidebar menu.",
+        "change my info": "Go to 'Profile & Settings' to update your information.",
+        "edit profile": "You can update your name, email, and DOB in 'Profile & Settings'.",
+        "where to update": "Profile edits can be made in the 'Profile & Settings' tab.",
+        
+        # Departments & Doctors
+        "available departments": "We offer Cardiology, Neurology, Pediatrics, Dermatology, and more.",
+        "doctor availability": "Use the 'Book Appointment' tab to see available doctors by department.",
+        "which doctor": "You can choose your doctor from the 'Book Appointment' tab based on department.",
+        "dermatology doctor": "Select 'Dermatology' from department in 'Book Appointment' to see options.",
+        
+        # Account & Security
+        "change password": "Password change is not currently supported directly via dashboard.",
+        "logout": "To logout, click on the logout button or close your session.",
+        "secure": "Your data is securely stored and encrypted in our system.",
+        
+        # Support & Contact
+        "contact support": "Please email us at support@ehrhospital.com for any help.",
+        "emergency": "In case of emergency, dial 108 or visit the nearest hospital.",
+        "24/7": "Support is available via email, but emergency services should be contacted for critical issues.",
+        "help": "For assistance, contact support or check the sidebar options.",
+        
+        # General Health
+        "health tips": "Stay hydrated, follow prescriptions, and attend scheduled check-ups.",
+        "routine checkup": "Book an appointment in 'Book Appointment' for routine check-ups.",
+        "vaccine record": "Currently, vaccination records are not supported in the dashboard.",
+        
+        # Technical
+        "not working": "Try refreshing your browser. If the issue persists, contact support.",
+        "error": "If you're seeing an error, please email us a screenshot at support@ehrhospital.com.",
+        "slow": "Performance may vary based on your internet connection.",
+        
+        # Miscellaneous
+        "insurance": "Currently, we don’t integrate with insurance providers.",
+        "lab results": "If lab reports are available, you can find them in the 'Reports' tab.",
+        "appointment history": "Your past appointments are available under 'Appointments'.",
+        "download": "Reports and prescriptions can be downloaded from their respective sections.",
+        "upload": "Only PDF and image formats are accepted in the 'Reports' tab.",
+        # Appointments
+        "book": "To book an appointment, go to the 'Book Appointment' tab in the sidebar.",
+        "appointment": "Check or book appointments in the 'Appointments' or 'Book Appointment' tab.",
+        "reschedule": "Currently, rescheduling isn't supported. Please cancel and rebook.",
+        "cancel": "You can cancel appointments from the 'Appointments' tab.",
+        "time": "Appointment times are shown under 'Appointments'.",
+        "doctor": "Available doctors are listed in 'Book Appointment' after selecting department.",
+        
+        # Reports
+        "report": "Go to the 'Reports' tab to upload, view or download medical files.",
+        "upload": "You can upload reports under the 'Reports' section.",
+        "download": "To download a report, open the file from 'Reports' and click download.",
+        "file": "All uploaded files are shown under the 'Reports' tab.",
+        
+        # Prescriptions
+        "prescription": "Your prescriptions are located in the 'Prescriptions' tab.",
+        "medication": "Medication details like dosage are shown in the 'Prescriptions' section.",
+        "medicine": "Check your medicines in the 'Prescriptions' tab.",
+        "dose": "Dosage instructions are included with your prescriptions.",
+        
+        # Profile
+        "profile": "You can update your information in the 'Profile & Settings' tab.",
+        "edit": "Use the 'Profile & Settings' tab to edit your details.",
+        "settings": "Go to 'Profile & Settings' to manage your account details.",
+        "email": "Your registered email is shown in the profile section.",
+        "dob": "DOB can be updated from 'Profile & Settings'.",
+        
+        # Navigation
+        "where": "All major sections are accessible from the sidebar.",
+        "how": "Please select the feature you need from the sidebar to continue.",
+        "menu": "Use the sidebar to explore features like Reports, Appointments, etc.",
+        
+        # Departments
+        "department": "We offer Cardiology, Dermatology, Neurology, Pediatrics, and more.",
+        "cardiology": "Book an appointment under Cardiology via the 'Book Appointment' tab.",
+        "neurology": "Neurology services are available in the 'Book Appointment' tab.",
+        "pediatrics": "You can consult a pediatrician using the 'Book Appointment' section.",
+        "dermatology": "Dermatology appointments can be booked under 'Book Appointment'.",
 
-        # 🧭 Navigation Help
-        "where is my profile": "Click on 'Profile & Settings' in the sidebar.",
-        "how do i view my health records": "Use the 'My Health Records' tab to access your symptoms and diagnosis.",
-        "where can i download reports": "Go to 'Reports' and click on the download button for each report.",
-        "how do i change my email": "Update your email in 'Profile & Settings'.",
-        "where do i upload reports": "In the 'Reports' section, use the uploader to add your files.",
-        "can i view past prescriptions": "Yes, go to 'Prescriptions' to see your issued medications.",
-        "how to logout": "Please use the sidebar navigation to return to the main page and logout.",
-
-        # 🏥 Department & Doctor Info
-        "what departments are available": "Departments include Cardiology, Neurology, Pediatrics, Dermatology, and more.",
-        "how do i know which doctor is available": "Use 'Book Appointment' to view available doctors by department.",
-        "can i choose department first": "Yes. First select a department, then choose an available doctor.",
-        "which doctor is in cardiology": "Select 'Cardiology' in the booking tab to see all related doctors.",
-        "how do i know doctor timings": "Appointment slots will be shown during the booking process.",
-        "are female doctors available": "Doctor details are shown under the 'Book Appointment' tab by name.",
-        "what building is my appointment in": "Building and room info will be displayed once your appointment is booked.",
-
-        # 📝 Reports & Uploads
-        "how do i upload medical report": "Go to the 'Reports' tab and use the upload feature.",
-        "what file formats are allowed": "You can upload PDF, JPG, or PNG files.",
-        "can i delete a report": "Currently, patients can't delete reports. Contact support if needed.",
-        "how do i view all reports": "Click on 'Reports' to view all uploads associated with your ID.",
-        "who can see my reports": "Only authorized medical staff (doctors/admins) can view your reports.",
-
-        # 💊 Prescriptions
-        "where can i find my prescriptions": "Go to the 'Prescriptions' tab to view your medication history.",
-        "can i download prescriptions": "Prescriptions may be saved as reports and downloaded from the Reports tab.",
-        "who uploaded my prescription": "Each prescription/report will display the name of the uploader (doctor/admin).",
-        "what if my prescription is missing": "Please contact your assigned doctor or raise the issue via support.",
-
-        # 🔐 Profile & Settings
-        "how do i update my dob": "Go to 'Profile & Settings' and change your Date of Birth.",
-        "can i edit my name": "Yes, use the 'Profile & Settings' tab.",
-        "how do i change my gender info": "Currently, gender can only be changed by the admin. Contact support.",
-        "how do i update my login email": "Use 'Profile & Settings' to change your registered email.",
-        "how do i reset password": "Currently password management is handled by the admin. Email support for assistance.",
-
-        # ❓ General FAQs
-        "how do i contact support": "Email us at support@ehrhospital.com.",
-        "do you have emergency services": "In emergencies, dial 108 or go to the nearest emergency room.",
-        "is there 24x7 support": "Support is available during working hours via email.",
-        "can i use this on mobile": "Yes, the portal is mobile responsive.",
-        "what if i forget my appointment time": "Go to the 'Appointments' tab to check your upcoming slots.",
-        "what is srm ehr": "SRM EHR is an Electronic Health Record system for managing patient information and care.",
-        "can i print my reports": "Yes, after downloading a report you can print it as needed.",
-        "how do i get notified for appointments": "Please check your email or visit the Appointments tab regularly.",
-        "what is my patient id": "Your Patient ID is shown under 'My Health Records' or 'Appointments'.",
-        "can i request a specific room": "Room assignment is automatic based on department."
+        # Support
+        "support": "Need help? Contact us at support@ehrhospital.com.",
+        "help": "For assistance, email us or explore the sidebar options.",
+        "contact": "Reach out to us via support@ehrhospital.com for help.",
+        "emergency": "In an emergency, dial 108 or visit the nearest hospital.",
+        
+        # General
+        "tips": "Stay hydrated, follow your treatment, and take rest as advised.",
+        "routine": "Routine check-ups can be booked under 'Book Appointment'.",
+        "checkup": "Book routine or specialist check-ups from the 'Book Appointment' section.",
+        "logout": "You can logout by ending your session or using the top-right menu.",
+        "error": "If you're facing an issue, please refresh or contact support.",
+        "slow": "Performance depends on your internet. Try refreshing the page.",
+        "insurance": "Insurance integration is not supported yet.",
+        "vaccine": "Vaccination details are not part of this portal currently.",
+        "history": "Check your appointment and report history in their respective tabs.",
     }
 
 
