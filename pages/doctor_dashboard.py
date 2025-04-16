@@ -309,7 +309,7 @@ elif selected == "Profile & Settings":
 
         new_name = st.text_input("Full Name", value=name)
         new_email = st.text_input("Email", value=email)
-        new_dob = st.date_input("Date of Birth", value=dob)
+        new_dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
 
         st.markdown("### 🏥 Department & Assignment Info")
         st.info(f"**Department:** {dept}")
