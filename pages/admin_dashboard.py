@@ -197,35 +197,35 @@ elif selected == "Patients":
     cursor = conn.cursor()
 
     with st.expander("➕ Add New Patient"):
-    name = st.text_input("Full Name")
-    email = st.text_input("Email")
-    dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
-    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
-    
-    if st.button("Add Patient"):
-        new_id = generate_custom_id("p", "patient")
-        age = datetime.now().year - dob.year
+        name = st.text_input("Full Name")
+        email = st.text_input("Email")
+        dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
+        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+        
+        if st.button("Add Patient"):
+            new_id = generate_custom_id("p", "patient")
+            age = datetime.now().year - dob.year
 
-        # Insert into users
-        cursor.execute("""
-            INSERT INTO users (id, name, email, dob, role)
-            VALUES (%s, %s, %s, %s, 'patient')
-        """, (new_id, name, email, dob))
+            # Insert into users
+            cursor.execute("""
+                INSERT INTO users (id, name, email, dob, role)
+                VALUES (%s, %s, %s, %s, 'patient')
+            """, (new_id, name, email, dob))
 
-        # Insert into approved_patients
-        cursor.execute("""
-            INSERT INTO approved_patients (name, dob, email)
-            VALUES (%s, %s, %s)
-        """, (name, dob, email))
+            # Insert into approved_patients
+            cursor.execute("""
+                INSERT INTO approved_patients (name, dob, email)
+                VALUES (%s, %s, %s)
+            """, (name, dob, email))
 
-        # Insert into patients table with dob, age, gender
-        cursor.execute("""
-            INSERT INTO patients (id, name, dob, age, gender)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (new_id, name, dob, age, gender))
+            # Insert into patients table with dob, age, gender
+            cursor.execute("""
+                INSERT INTO patients (id, name, dob, age, gender)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (new_id, name, dob, age, gender))
 
-        conn.commit()
-        st.success("✅ Patient added successfully!")
+            conn.commit()
+            st.success("✅ Patient added successfully!")
 
 
     st.markdown("---")
