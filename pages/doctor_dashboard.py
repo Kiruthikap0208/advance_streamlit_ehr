@@ -268,20 +268,21 @@ elif selected == "Prescriptions":
     selected_patient = st.selectbox("Choose Patient", list(patient_map.keys()), key="prescription_patient")
     symptoms = st.text_area("Symptoms")
     diagnosis = st.text_area("Diagnosis")
-    prescription_text = st.text_area("Enter Prescription")
+    medicine = st.text_input("Medicine Name")
+    dosage = st.text_input("Dosage Instructions")
 
     doctor_id = user_id  # from session
     patient_id = patient_map[selected_patient]
 
     if st.button("Save Prescription"):
-        if not prescription_text.strip():
-            st.warning("Please enter the prescription.")
+        if not medicine.strip() or not dosage.strip():
+            st.warning("Please enter both medicine and dosage.")
         else:
-            # Save prescription to prescriptions table
+            # Save to prescriptions table
             cursor.execute("""
-                INSERT INTO prescriptions (patient_id, doctor_id, medicine, dosage, instructions, date_issued)
-                VALUES (%s, %s, %s, %s, %s, NOW())
-            """, (patient_id, doctor_id, prescription_text, "-", "Follow as instructed"))
+                INSERT INTO prescriptions (patient_id, doctor_id, medicine, dosage, date_issued)
+                VALUES (%s, %s, %s, %s, NOW())
+            """, (patient_id, doctor_id, medicine, dosage))
 
             # Update patients table
             cursor.execute("SELECT id FROM patients WHERE id = %s", (patient_id,))
@@ -299,7 +300,7 @@ elif selected == "Prescriptions":
                 """, (patient_id, selected_patient.split(" (")[0], symptoms, diagnosis, doctor_id))
 
             conn.commit()
-            st.success("✅ Prescription saved and patient record updated.")
+            st.success("✅ Prescription saved and patient info updated.")
 
 
 elif selected == "Profile & Settings":
