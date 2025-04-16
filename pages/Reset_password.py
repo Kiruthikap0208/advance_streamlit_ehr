@@ -106,7 +106,7 @@ with col3:
             # Clear session and redirect
             st.session_state.password_updated = False
             st.session_state.verified_email = ""
-            switch_page("main")
+            st.page_link("main.py", label="🔐 Back to Login", icon="🔒")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
