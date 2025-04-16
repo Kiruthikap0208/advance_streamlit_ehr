@@ -242,9 +242,17 @@ elif selected == "Profile & Settings":
     else:
         st.error("Profile not found.")
 
+# Initialize session state for chatbot
+if "show_chatbot" not in st.session_state:
+    st.session_state.show_chatbot = False
+
+# Toggle chatbot display
 if st.button("🤖 Need Help?"):
-    st.markdown("---")
-    st.subheader("🤖 I am here to assist you!")
+    st.session_state.show_chatbot = not st.session_state.show_chatbot
+
+# Render chatbot if visible
+if st.session_state.show_chatbot:
     render_chatbot()
+
 
 conn.close()

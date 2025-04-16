@@ -50,7 +50,6 @@ def render_chatbot():
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
     st.markdown("**🤖 Bot:** Hi there! I’m your assistant. Ask me anything related to your dashboard!")
 
     user_input = st.text_input("You:", key="chat_input")
