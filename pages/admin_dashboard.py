@@ -415,25 +415,27 @@ elif selected == "Reports":
     os.makedirs("reports", exist_ok=True)
 
     uploaded = st.file_uploader("Upload Report", type=["pdf", "jpg", "png"], key="report_upload")
-    patient_id = st.text_input("Patient ID for report", key="report_pid")
-    uploaded_by = st.text_input("Uploaded by (Admin ID)", key="report_admin")
+    # Fetch all patients for dropdown
+    cursor.execute("SELECT id, name FROM users WHERE role='patient'")
+    patients = cursor.fetchall()
+    patient_map = {f"{name} ({pid})": pid for pid, name in patients}
+    selected_patient = st.selectbox("Select Patient", list(patient_map.keys()), key="report_pid")
+
+    # Fetch all admins for dropdown
+    cursor.execute("SELECT id, name FROM users WHERE role='admin'")
+    admins = cursor.fetchall()
+    admin_map = {f"{name} ({aid})": aid for aid, name in admins}
+    selected_admin = st.selectbox("Uploaded By (Admin)", list(admin_map.keys()), key="report_admin")
+
     submit = st.button("Submit Report")
 
     conn = create_connection()
     cursor = conn.cursor()
 
-    if submit and uploaded and patient_id and uploaded_by:
-        file_path = f"reports/{uploaded.name}"
-        with open(file_path, "wb") as f:
-            f.write(uploaded.getvalue())
-        cursor.execute(
-            "INSERT INTO reports (patient_id, file_path, uploaded_by, uploaded_at) VALUES (%s, %s, %s, NOW())",
-            (patient_id, file_path, uploaded_by)
-        )
-        conn.commit()
-        st.success("Report uploaded successfully!")
+    if submit and uploaded:
+        patient_id = patient_map[selected_patient]
+        uploaded_by = admin_map[selected_admin]
 
-    if submit and uploaded and patient_id and uploaded_by:
         file_path = f"reports/{uploaded.name}"
         with open(file_path, "wb") as f:
             f.write(uploaded.getvalue())
@@ -443,7 +445,6 @@ elif selected == "Reports":
         )
         conn.commit()
         st.success("Report uploaded successfully!")
-    
 
     st.markdown("---")
     st.subheader("🗂️ All Reports")
