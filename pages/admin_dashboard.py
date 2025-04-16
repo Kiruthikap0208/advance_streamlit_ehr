@@ -263,30 +263,31 @@ elif selected == "Doctors":
         email = st.text_input("Email")
         dob = st.date_input("Date of Birth", min_value=date(1950, 1, 1), max_value=date.today())
 
-        # Fetch department list and show as dropdown
+        # Fetch departments with their IDs
         cursor.execute("SELECT dept_name, id FROM departments")
         department_records = cursor.fetchall()
-        department_options = {f"{name} (ID: {did})": (name, did) for name, did in department_records}
-        selected_dept = st.selectbox("Select Department", list(department_options.keys()))
-        dept_name, dept_id = department_options[selected_dept]
+        department_options = {f"{dept_name} (ID: {dept_id})": (dept_name, dept_id) for dept_name, dept_id in department_records}
+        selected_dept_label = st.selectbox("Select Department", list(department_options.keys()))
+        department_name, department_id = department_options[selected_dept_label]
 
         if st.button("Add Doctor"):
             new_id = generate_custom_id("d", "doctor")
 
-            # Insert into users
+            # Insert into users table
             cursor.execute("""
                 INSERT INTO users (id, name, email, role, dob)
                 VALUES (%s, %s, %s, 'doctor', %s)
             """, (new_id, name, email, dob))
 
-            # Insert into approved_doctors with dept_name and dept_id
+            # Insert into approved_doctors table with department_id
             cursor.execute("""
-                INSERT INTO approved_doctors (id, name, dob, department, dept_id, email)
+                INSERT INTO approved_doctors (id, name, dob, department, department_id, email)
                 VALUES (%s, %s, %s, %s, %s, %s)
-            """, (new_id, name, dob, dept_name, dept_id, email))
+            """, (new_id, name, dob, department_name, department_id, email))
 
             conn.commit()
             st.success("✅ Doctor added successfully!")
+
 
 
     st.markdown("---")
