@@ -4,8 +4,8 @@ def render_chatbot():
     # Improved FAQ response mapping
     faq_responses = {
         # Appointments
-        "book": "Go to the 'Book Appointment' section in the sidebar to schedule an appointment.",
-        "appointment": "You can manage your appointments in the 'Appointments' tab.",
+        "book appointment": "Go to the 'Book Appointment' section in the sidebar to schedule an appointment.",
+        "appointment details": "You can manage your appointments in the 'Appointments' tab.",
         "reschedule": "Rescheduling is not available. Please cancel and rebook.",
         "cancel": "Cancel appointments in the 'Appointments' section.",
         "date": "Select your appointment date in the 'Book Appointment' tab.",
