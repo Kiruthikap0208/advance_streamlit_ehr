@@ -65,12 +65,13 @@ def render_chatbot():
     }
 
 
-    def get_response(user_input):
+    def match_faq(user_input):
         user_input = user_input.lower()
         for keyword, response in faq_responses.items():
             if keyword in user_input:
                 return response
-        return "🤖 I'm sorry, I couldn't understand that. Please try asking differently."
+        return "I'm sorry, I couldn't understand that. Please try asking differently."
+
 
     # UI Styling
     st.markdown("""
