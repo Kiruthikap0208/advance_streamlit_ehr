@@ -104,7 +104,7 @@ def render_chatbot():
 
     user_input = st.text_input("You:", key="chat_input")
     if user_input:
-        response = get_response(user_input)
+        response = match_faq(user_input)
         st.markdown(f"**🧑 You:** {user_input}")
         st.markdown(f"**🤖 Bot:** {response}")
 
