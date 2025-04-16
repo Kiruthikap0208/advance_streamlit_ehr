@@ -201,23 +201,32 @@ elif selected == "Assigned Patients":
 
 elif selected == "Diagnoses":
     st.subheader("📝 Update Diagnoses")
+
     cursor.execute("SELECT id, name FROM users WHERE role = 'patient'")
     patients = cursor.fetchall()
     patient_map = {f"{name} ({pid})": pid for pid, name in patients}
     selected_patient = st.selectbox("Select Patient", list(patient_map.keys()))
+
     symptoms = st.text_area("Symptoms")
     diagnosis = st.text_area("Diagnosis")
-    doctor_id = st.text_input("Doctor ID (Your ID)")
+
     if st.button("Save Diagnosis"):
+        doctor_id = user_id  # Automatically use logged-in doctor ID
         pid = patient_map[selected_patient]
+
         cursor.execute("SELECT id FROM patients WHERE id = %s", (pid,))
         exists = cursor.fetchone()
+
         if exists:
-            cursor.execute("UPDATE patients SET symptoms = %s, diagnosis = %s WHERE id = %s",
-                           (symptoms, diagnosis, pid))
+            cursor.execute(
+                "UPDATE patients SET symptoms = %s, diagnosis = %s, created_by = %s WHERE id = %s",
+                (symptoms, diagnosis, doctor_id, pid)
+            )
         else:
-            cursor.execute("INSERT INTO patients (id, name, symptoms, diagnosis, created_by) VALUES (%s, %s, %s, %s, %s)",
-                           (pid, selected_patient.split(' (')[0], symptoms, diagnosis, doctor_id))
+            cursor.execute(
+                "INSERT INTO patients (id, name, symptoms, diagnosis, created_by) VALUES (%s, %s, %s, %s, %s)",
+                (pid, selected_patient.split(' (')[0], symptoms, diagnosis, doctor_id)
+            )
         conn.commit()
         st.success("Diagnosis saved successfully!")
 
