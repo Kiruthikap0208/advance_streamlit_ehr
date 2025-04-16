@@ -199,7 +199,8 @@ elif selected == "Appointments":
 
     cursor.execute("""
         SELECT a.id, a.appointment_time, a.notes,
-               d.name AS doctor_name, ad.department
+               d.name AS doctor_name, ad.department,
+               a.building, a.room_no
         FROM appointments a
         JOIN users d ON a.doctor_id = d.id
         JOIN approved_doctors ad ON d.email = ad.email
@@ -211,7 +212,7 @@ elif selected == "Appointments":
     if not rows:
         st.info("You have no appointments yet.")
     else:
-        for appt_id, appt_time, notes, doctor_name, department in rows:
+        for appt_id, appt_time, notes, doctor_name, department, building, room in rows:
             is_future = appt_time > datetime.now()
             color = "green" if is_future else "gray"
 
@@ -220,6 +221,8 @@ elif selected == "Appointments":
                     <div style='border-left: 5px solid {color}; padding-left: 10px; margin-bottom: 15px; color:white'>
                         <strong>Doctor:</strong> {doctor_name} ({department})<br>
                         <strong>Date & Time:</strong> {appt_time.strftime("%Y-%m-%d %H:%M")}<br>
+                        <strong>Building:</strong> {building or 'N/A'}<br>
+                        <strong>Room:</strong> {room or 'N/A'}<br>
                         <strong>Notes:</strong> {notes or '—'}
                     </div>
                 """, unsafe_allow_html=True)
