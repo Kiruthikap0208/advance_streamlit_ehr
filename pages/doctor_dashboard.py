@@ -111,9 +111,10 @@ if selected == "Calendar":
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
-        JOIN approved_doctors ad ON CAST(SUBSTRING_INDEX(d.id, '_', -1) AS UNSIGNED) = ad.id
+        JOIN approved_doctors ad ON d.email = ad.email
         WHERE a.doctor_id = %s
     """, (user_id,))
+
 
     appointments = cursor.fetchall()
 
