@@ -105,15 +105,16 @@ if selected == "Calendar":
 
     cursor.execute("""
         SELECT a.id, a.appointment_time, a.notes,
-               p.id AS patient_id, p.name AS patient_name,
-               d.id AS doctor_id, d.name AS doctor_name,
-               ad.department
+            p.id AS patient_id, p.name AS patient_name,
+            d.id AS doctor_id, d.name AS doctor_name,
+            ad.department
         FROM appointments a
         JOIN users p ON a.patient_id = p.id
         JOIN users d ON a.doctor_id = d.id
-        JOIN approved_doctors ad ON d.id = ad.id
+        JOIN approved_doctors ad ON CAST(SUBSTRING_INDEX(d.id, '_', -1) AS UNSIGNED) = ad.id
         WHERE a.doctor_id = %s
     """, (user_id,))
+
     appointments = cursor.fetchall()
 
     events = []
